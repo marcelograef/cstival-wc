@@ -25,18 +25,18 @@ $size-card: 2.4rem;
 	}
 
 	&.call {
-		background-color: $call-color;
+		background-color: $cs-call-color;
 	}
 	&.raise {
-		background-color: $raise-color;
+		background-color: $cs-raise-color;
 	}
 
 	&.bluff {
-		background-color: $bluff-color;
+		background-color: $cs-bluff-color;
 	}
 
 	&.fold {
-		background-color: $fold-color;
+		background-color: $cs-fold-color;
 	}
 
 	-webkit-touch-callout: none; /* iOS Safari */

@@ -1,7 +1,7 @@
 @import '../../assets/styles/index.scss';
 
-.header {
-	max-width: 75.125rem;
+.cs-container {
+	max-width: 75%;
 	padding-right: 1rem;
 	padding-left: 1rem;
 	margin-right: auto;
@@ -18,7 +18,7 @@
 	margin-bottom: 20px;
 }
 
-.sections {
+.cs-sections {
 	width: 100%;
 	display: flex;
 	justify-content: space-around;
@@ -34,8 +34,8 @@
 
 		cursor: pointer;
 		width: 100%;
-		background-color: $color-base;
-		color: $color-white;
+		background-color: $cs-color-base;
+		color: $cs-color-white;
 		border: 1px solid rgb(156, 155, 155);
 		&:first-child {
 			border-radius: 5px 0 0 5px;
@@ -45,8 +45,13 @@
 		}
 		padding: 10px;
 		&.active {
-			color: $color-red;
+			color: $cs-color-red;
 			border: 1px solid rgb(156, 155, 155);
 		}
 	}
+}
+
+.cs-content {
+	height: 80vh;
+	width: 100%;
 }

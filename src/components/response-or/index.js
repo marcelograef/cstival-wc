@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useEffect, useState } from 'react';
 
-import { getData } from '../../utilities';
+import { getData, getRealPositionLong } from '../../utilities';
 import { CardTable, InfoContainer } from '../index';
 //import { ranges } from './ranges';
 import { calculateAvg } from '../../utilities/calculateInfo';
@@ -13,6 +13,7 @@ export const ResponseOR = () => {
 	const { tableValues, setTableValues } = useContext(MyContext);
 	const [avg, setAvg] = useState(null);
 	const [range, setRange] = useState({ info: {} });
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [yourPosition, setYourPosition] = useState('');
 	const [villainPosition, setVillainPosition] = useState('');
@@ -23,7 +24,7 @@ export const ResponseOR = () => {
 	}, [range]);
 
 	const getPositions = (player = '') => {
-		const positions = 'UTG-1,UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
+		const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
 		const positionsArray = positions.split(',');
 		return positionsArray.map(p => {
 			let active = '';
@@ -52,33 +53,16 @@ export const ResponseOR = () => {
 							indexVP = positionsArray.indexOf(p);
 						}
 
-						const getRealPosition = pos => {
-							let realPos;
-							if (pos <= 2) {
-								realPos = 'EP';
-							} else if (pos <= 4) {
-								realPos = 'MP';
-							} else if (pos === 5) {
-								realPos = 'HJ';
-							} else if (pos === 6) {
-								realPos = 'CO';
-							} else if (pos === 7) {
-								realPos = 'BU';
-							} else if (pos === 8) {
-								realPos = 'SB';
-							} else {
-								realPos = 'BB';
-							}
 
-							return realPos;
-						};
 
-						const realYourPos = getRealPosition(indexYP);
-						const realVillainPos = getRealPosition(indexVP);
+						const realYourPos = getRealPositionLong(indexYP);
+						const realVillainPos = getRealPositionLong(indexVP);
 						setTableValues(initialState);
+						setIsLoading(true);
 						getData('ROR', `${realYourPos}|${realVillainPos}`).then(rangeData => {
 							setRange(rangeData);
 							setTableValues(rangeData);
+							setIsLoading(false);
 						});
 					}}
 				>
@@ -98,12 +82,10 @@ export const ResponseOR = () => {
 				{getPositions('you')}
 			</div>
 			<div className="flex-container">
-				{yourPosition && villainPosition && (
-					<div className="row content-container">
-						<CardTable />
-						<InfoContainer data={{ ...range?.info, avg }} />
-					</div>
-				)}
+				<div className="row content-container">
+					<CardTable isLoading={isLoading} />
+					<InfoContainer data={{ ...range?.info, avg }} />
+				</div>
 			</div>
 		</div>
 	);

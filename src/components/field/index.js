@@ -1,9 +1,25 @@
 import React from 'react';
+import './index.scss';
 
-const Field = ({ type, name, label, error, options, register, placeholder, value }) => (
+const Field = ({
+	type,
+	name,
+	label,
+	error,
+	options,
+	register,
+	placeholder,
+	value,
+	clear,
+	clearFunction,
+	actionToAdd
+}) => (
 	<div className={`c-form__field c-form__field--${type}${error ? ' c-form__field--error' : ''}`}>
 		<header className="c-form__field-head">
-			<label htmlFor={name}>{label}</label>
+			<div className={`label-container ${actionToAdd === name ? 'selected-' + actionToAdd : ''}`}>
+				<label htmlFor={name}>{label}</label>
+				{clear && <p onClick={clearFunction}>X</p>}
+			</div>
 			{error && <p className="c-form__error">{error.message}</p>}
 		</header>
 
@@ -17,7 +33,20 @@ const Field = ({ type, name, label, error, options, register, placeholder, value
 					))}
 			</select>
 		) : type === 'textarea' ? (
-			<textarea id={name} {...register(name)} placeholder={placeholder} cols={30} rows={10}></textarea>
+			<div>
+				<textarea
+					name={name}
+					id={name}
+					{...register}
+					placeholder={placeholder}
+					cols={30}
+					rows={10}
+					value={value}
+				></textarea>
+				<button name={`${name}-1`} onClick={clearFunction}>
+					X
+				</button>
+			</div>
 		) : (
 			<input name={name} id={name} {...register} type={type} placeholder={placeholder} value={value} />
 		)}

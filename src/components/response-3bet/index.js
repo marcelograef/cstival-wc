@@ -3,21 +3,22 @@ import { useEffect, useState } from 'react';
 import { CardTable, InfoContainer } from '../index';
 import './index.scss';
 
-import { getData } from '../../utilities';
+import { getData, getRealPositionLong } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo';
 import MyContext from '../../context';
 import { initialState } from '../../constants.js';
 
 export const Response3Bet = () => {
+	const { setTableValues } = useContext(MyContext);
+		const [isLoading, setIsLoading] = useState(false);
 
-	const { tableValues, setTableValues } = useContext(MyContext);
 	const [yourPosition, setYourPosition] = useState('');
 	const [villainPosition, setVillainPosition] = useState('');
 	const [sbAction, setSbAction] = useState('');
 	const [range, setRange] = useState({ info: {} });
 	const [avg, setAvg] = useState(null);
 
-	const positions = 'UTG-1,UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
+	const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
 	const positionsArray = positions.split(',');
 
 	useEffect(() => {
@@ -59,15 +60,18 @@ export const Response3Bet = () => {
 							indexVP = positionsArray.indexOf(p);
 						}
 
-						const realYourPos = getRealPosition(indexYP);
-						const realVillainPos = getRealPosition(indexVP);
+						const realYourPos = getRealPositionLong(indexYP);
+						const realVillainPos = getRealPositionLong(indexVP);
 						if (!(yourPosition === 'SB' && villainPosition === 'BB')) {
 							setSbAction('');
 						}
 						setTableValues(initialState);
+						setIsLoading(true)
+						setIsLoading(true)
 						getData('RES3', `${realYourPos}|${realVillainPos}`).then(rangeData => {
 							setRange(rangeData);
 							setTableValues(rangeData);
+							setIsLoading(false)
 						});
 					}}
 				>
@@ -77,40 +81,22 @@ export const Response3Bet = () => {
 		});
 	};
 
-	const getRealPosition = (pos) => {
-		let realPos;
-		if (pos <= 2) {
-			realPos = 'EP';
-		} else if (pos <= 4) {
-			realPos = 'MP';
-		} else if (pos === 5) {
-			realPos = 'HJ';
-		} else if (pos === 6) {
-			realPos = 'CO';
-		} else if (pos === 7) {
-			realPos = 'BU';
-		} else if (pos === 8) {
-			realPos = 'SB';
-		} else {
-			realPos = 'BB';
-		}
-
-		return realPos;
-	};
 
 	const sbVsBbOptions = () => {
 		const indexYP = positionsArray.indexOf(yourPosition);
 		const indexVP = positionsArray.indexOf(villainPosition);
 
-		const realYourPos = getRealPosition(indexYP);
-		const realVillainPos = getRealPosition(indexVP);
+		const realYourPos = getRealPositionLong(indexYP);
+		const realVillainPos = getRealPositionLong(indexVP);
 
-		const onClick = (action) => {
+		const onClick = action => {
 			setSbAction(action);
 			setTableValues(initialState);
+			setIsLoading(true)
 			getData('RES3', `${realYourPos}|${realVillainPos}|${action}`).then(rangeData => {
 				setRange(rangeData);
 				setTableValues(rangeData);
+				setIsLoading(false)
 			});
 		};
 		return (
@@ -142,12 +128,10 @@ export const Response3Bet = () => {
 				<div className="selector-body">{sbVsBbOptions()}</div>
 			)}
 			<div className="flex-container">
-				{yourPosition && villainPosition && (
-					<div className="row content-container">
-						<CardTable />
-						<InfoContainer data={{ ...range?.info, avg }} />
-					</div>
-				)}
+				<div className="row content-container">
+					<CardTable isLoading={isLoading} />
+					<InfoContainer data={{ ...range?.info, avg }} />
+				</div>
 			</div>
 		</div>
 	);

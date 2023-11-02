@@ -51,16 +51,16 @@
 	border: 2px solid rgba(129, 127, 127, 0.7);
 
 	&[data-action='RAISE'] {
-		background-color: $raise-color;
+		background-color: $cs-raise-color;
 	}
 	&[data-action='CALL'] {
-		background-color: $call-color;
+		background-color: $cs-call-color;
 	}
 	&[data-action='FOLD'] {
-		background-color: $fold-color;
+		background-color: $cs-fold-color;
 	}
 	&[data-action='BLUFF'] {
-		background-color: $bluff-color;
+		background-color: $cs-bluff-color;
 	}
 }
 

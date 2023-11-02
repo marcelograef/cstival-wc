@@ -1,0 +1,32 @@
+@import '../../assets/styles/index.scss';
+
+.label-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	width: 100%;
+	height: 1rem;
+	line-height: 1rem;
+	align-items: center;
+
+	& p {
+		cursor: pointer;
+	}
+}
+
+textarea {
+	resize: vertical;
+}
+
+$actions: (
+	call: $cs-call-color,
+	bluff: $cs-bluff-color,
+	fold: $cs-fold-color,
+	raise: $cs-raise-color
+);
+
+@each $action, $color in $actions {
+	.selected-#{$action} {
+		background-color: $color;
+	}
+}

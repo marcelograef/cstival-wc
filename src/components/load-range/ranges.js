@@ -1,10 +1,6 @@
-import { TableState } from '@src/store/branches/table/interfaces';
 
-export interface TableStateData {
-	[key: string]: TableState;
-}
 
-export const ranges: TableStateData = {
+export const ranges = {
 	'EP|EP': {
 		bluff: 'AQ,KJs,ATs',
 		call: 'AQs,KQs,QJs,JTs,88+',

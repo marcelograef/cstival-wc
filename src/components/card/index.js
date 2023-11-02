@@ -8,7 +8,7 @@ const colors = {
 	fold: 'rgba(139, 138, 138, 0.8)'
 };
 
-const Card = ({ children, suited, action, onMouseEnter, ...props }) => {
+const Card = ({ children, suited, action, onMouseEnter, actionToAdd, ...props }) => {
 	const actionAmount = action.length;
 
 	let formerPercentage = 0;
@@ -20,6 +20,10 @@ const Card = ({ children, suited, action, onMouseEnter, ...props }) => {
 	});
 
 	const style = action.length > 0 ? { background: `linear-gradient(to right,  ${colorString.join(', ')}` } : {};
+
+	if (actionToAdd) {
+		style.cursor = 'pointer';
+	}
 	return (
 		<div
 			className={`card ${suited ? 'suited' : ''} ${!!action ? action.join(' ') : ''}`}

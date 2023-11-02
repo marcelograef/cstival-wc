@@ -2,8 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import MyContext from '../../context';
 import Card from '../card/index';
 import './index.scss';
+import Spinner from '../spinner';
+import { initialState } from '../../constants';
 
-export const CardTable = ({ isEditable = false, actionToAdd }) => {
+export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }) => {
 	const { tableValues, setTableValues } = useContext(MyContext);
 
 	const [mouseDown, setMouseDown] = useState(false);
@@ -63,7 +65,7 @@ export const CardTable = ({ isEditable = false, actionToAdd }) => {
 								.map((c, i) => {
 									const index1 = cards.indexOf(v[0]);
 									const index2 = cards.indexOf(v[3]);
-									console.log({ index1, index2 });
+									// console.log({ index1, index2 });
 									if (index1 <= i && index2 >= i) {
 										return `${c}${c}`;
 									}
@@ -105,14 +107,14 @@ export const CardTable = ({ isEditable = false, actionToAdd }) => {
 				})
 				.join(',');
 
-			console.log({ previous });
+			// console.log({ previous });
 			try {
 				value = [...previous.split(',').filter(value => value !== ''), combo].join(',');
 			} catch (error) {
 				value = combo;
 			}
 
-			console.log({ value });
+			// console.log({ value });
 
 			const pairs = value
 				.split(',')
@@ -143,7 +145,7 @@ export const CardTable = ({ isEditable = false, actionToAdd }) => {
 					return c;
 				})
 				.join(',');
-			console.log({ pairs });
+			// console.log({ pairs });
 			const suiteds = value
 				.split(',')
 				.filter(c => c.includes('s'))
@@ -243,6 +245,10 @@ export const CardTable = ({ isEditable = false, actionToAdd }) => {
 	};
 
 	const generateGrid = combosObjectParam => {
+		if (!combosObjectParam) {
+			setTableValues(initialState);
+			combosObjectParam = initialState;
+		}
 		const cards = 'AKQJT98765432';
 		const cardList = [];
 		for (const c of cards) {
@@ -347,8 +353,9 @@ export const CardTable = ({ isEditable = false, actionToAdd }) => {
 					action={action}
 					onMouseDown={() => onClick(c)}
 					onMouseEnter={() => onMouseEnter(c)}
+					actionToAdd={actionToAdd}
 				>
-					{c}
+					{isLoading ? <Spinner className="small" /> : c}
 				</Card>
 			);
 		});

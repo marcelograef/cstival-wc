@@ -1,9 +1,15 @@
 import axios from 'axios';
 
-const url = 'http://localhost:8080/wp-json/cstival/v1';
+//const url = 'https://cstivalpoker.com/wp-json/cstival/v1'
+//const url = 'http://localhost:8080/wp-json/cstival/v1';
+
+const url = process.env.REACT_APP_API_URL;
+
 
 const getData = async (key, situation) => {
 	console.log({ url, key, situation });
+
+
 	return axios
 		.get(`${url}/ranges`, {
 			params: {
@@ -34,11 +40,18 @@ const saveRange = async body => {
 		url: `${url}/ranges`,
 		data: body
 	}).then(r => {
-		return r.data[0];
+		return r;
 	});
 };
 
-export {
-	getData,
-	saveRange
+const login = async body => {
+	return axios({
+		method: 'post',
+		url: `${url}/login`,
+		data: body
+	}).then(r => {
+		return r;
+	});
 };
+
+export { getData, saveRange, login };

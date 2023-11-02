@@ -2,23 +2,24 @@
 @use 'sass:color';
 @use 'sass:string';
 
-$color-base: #333;
-$color-white: #fff;
-$color-black: #000;
-$color-error: #f00;
-$color-action: #00f;
-$color-warning: #ff0;
+$cs-color-base: #232121;
+$cs-color-white: #fff;
+$cs-color-black: #000;
+$cs-color-error: #f00;
+$cs-color-action: #00f;
+$cs-color-warning: #ff0;
+$cs-color-selected: rgb(90, 90, 91);
 
-$color-red: #d65050;
+$cs-color-red: #d65050;
 
-$bluff-color: #f34646;
-$raise-color: rgba(39, 199, 18, 0.938);
-$call-color: rgb(255, 251, 0);
-$fold-color: rgba(139, 138, 138, 0.8);
+$cs-bluff-color: #f34646;
+$cs-raise-color: rgba(39, 199, 18, 0.938);
+$cs-call-color: rgb(255, 251, 0);
+$cs-fold-color: rgba(139, 138, 138, 0.8);
 
-$timing: 0.4s;
-$easing: ease-in-out;
-$small-desktop: 1439px;
-$tablet-landscape: 1279px;
-$tablet-portrait: 1023px;
-$mobile: 767px;
+$cs-timing: 0.4s;
+$cs-easing: ease-in-out;
+$cs-small-desktop: 1439px;
+$cs-tablet-landscape: 1279px;
+$cs-tablet-portrait: 1023px;
+$cs-mobile: 767px;

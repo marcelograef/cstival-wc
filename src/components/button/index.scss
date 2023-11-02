@@ -3,29 +3,29 @@
 	font-family: sans-serif;
 	font-size: 0.8rem;
 	line-height: 1.875;
-	color: $color-white;
+	color: $cs-color-white;
 	display: inline-block;
 	vertical-align: middle;
 	padding: 0.5rem 1.5rem;
-	border: 1px solid $color-base;
-	background: $color-base;
+	border: 1px solid $cs-color-base;
+	background: $cs-color-base;
 	border-radius: 0.3125rem;
 	box-shadow: none;
 	cursor: pointer;
-	transition: all $timing $easing;
+	transition: all $cs-timing $cs-easing;
 
 	@include hover {
-		color: $color-base;
-		background: $color-white;
+		color: $cs-color-base;
+		background: $cs-color-white;
 	}
 
 	&--outline {
-		color: $color-base;
+		color: $cs-color-base;
 		background-color: transparent;
 
 		@include hover {
-			color: $color-white;
-			background-color: $color-base;
+			color: $cs-color-white;
+			background-color: $cs-color-base;
 		}
 	}
 }

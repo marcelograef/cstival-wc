@@ -2,15 +2,17 @@ import React, { useContext } from 'react';
 import { CardTable, InfoContainer } from '../index';
 
 import { forwardRef, useEffect, useRef, useState } from 'react';
-import { getData } from '../../utilities';
+import { initialState } from '../../constants.js';
+import MyContext from '../../context';
+import { getData, getRealPositionShort } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo';
 import './index.scss';
 import { ranges } from './ranges';
-import MyContext from '../../context';
-import { initialState } from '../../constants.js';
 
 export const PushPositionStack = () => {
 	const { tableValues, setTableValues } = useContext(MyContext);
+
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [yourPosition, setYourPosition] = useState('');
 	const [selectedCell, setSelectedCell] = useState({ row: '', column: '' });
@@ -45,19 +47,8 @@ export const PushPositionStack = () => {
 						setYourPosition(p);
 						indexYP = positionsArray.indexOf(p);
 
-						const getRealPosition = pos => {
-							let realPos;
-							if (pos <= 5 || pos === 8) {
-								realPos = 'HJ';
-							} else if (pos === 9) {
-								realPos = 'BB';
-							} else {
-								realPos = 'CO|BU';
-							}
-							return realPos;
-						};
 
-						const realYourPos = getRealPosition(indexYP);
+						const realYourPos = getRealPositionShort(indexYP);
 
 						/* dispatch({
 							type: LOAD_TABLE,
@@ -117,35 +108,26 @@ export const PushPositionStack = () => {
 		const column = cellElement.getAttribute(cellDataAddressCol);
 
 		const dataAddress = `R${row}C${column}`;
+
+		const pos = positionsArray[row - 1];
+		const bbs = column;
 		if (dataAddress && gridElement) {
 			setSelectedCell({ row, column });
-			setPositionSelected(positionsArray[row - 1]);
-			setBbsSelected(column);
+			setPositionSelected(pos);
+			setBbsSelected(bbs);
 		}
 
-		let text = event.target.innerText;
-		const [pos, bbs] = text.split('-');
-		const situation = `${pos.replace('+', '').replace(/\s/, '')}|${bbs.trim()}BB`;
+		//let text = event.target.innerText;
+		//const [pos, bbs] = text.split('-');
+		//const situation = `${pos.replace('+', '').replace(/\s/, '')}|${bbs.trim()}BB`;
 
-		let flag = false;
-		const auxRanges = [];
-		[...positionsArray, 'BB'].forEach(p => {
-			if (flag) {
-				auxRanges.push(`F-${p}|${pos.trim().replace('+', '')}|${bbs.trim()}BB`);
-			}
-			if (p === pos.trim()) {
-				flag = true;
-			}
-		});
-		setFaltRanges(auxRanges);
-		setFlatSelected(-1);
-		setTableValues(initialState)
+		/*
+		console.log({ situation });
 
 		getData('PUSH', situation).then(rangeData => {
 			setRange(rangeData);
-			setTableValues(rangeData)
-
-		});
+			setTableValues(rangeData);
+		}); */
 	};
 
 	const handleSelection = event => {
@@ -173,12 +155,27 @@ export const PushPositionStack = () => {
 	useEffect(() => {
 		console.log({ positionSelected, bbsSelected });
 		if (bbsSelected && positionSelected) {
+			let flag = false;
+			const auxRanges = [];
+			[...positionsArray, 'BB'].forEach(p => {
+				if (flag) {
+					auxRanges.push(`F-${p}|${positionSelected.trim().replace('+', '')}|${bbsSelected.trim()}BB`);
+				}
+				if (p === positionSelected.trim()) {
+					flag = true;
+				}
+			});
+			setFaltRanges(auxRanges);
+			setFlatSelected(-1);
+			setTableValues(initialState);
+
 			setSelectedCell({ row: positionsArray.indexOf(positionSelected) + 1, column: bbsSelected });
 			const situation = `${positionSelected.replace('+', '')}|${bbsSelected}BB`;
+			setIsLoading(true);
 			getData('PUSH', situation).then(rangeData => {
 				setRange(rangeData);
-				setTableValues(rangeData)
-
+				setTableValues(rangeData);
+				setIsLoading(false);
 			});
 		}
 	}, [positionSelected, bbsSelected]);
@@ -186,9 +183,14 @@ export const PushPositionStack = () => {
 	const loadRange = (rangeSelector, index) => {
 		setTableValues(initialState);
 		setFlatSelected(index);
+		console.log('Range selector');
+		console.log(rangeSelector.replace('+', '').replace(/\s/, ''));
+		console.log('Range selector');
+		setIsLoading(true);
 		getData('PUSH', rangeSelector.replace('+', '').replace(/\s/, '')).then(rangeData => {
 			setRange(rangeData);
 			setTableValues(rangeData);
+			setIsLoading(false);
 		});
 	};
 
@@ -259,18 +261,16 @@ export const PushPositionStack = () => {
 				<div className="selector-push">
 					<span>BBs</span>
 					<div>
-						{Array.from({ length: 19 }, (x, i) => i + 2)
-							.reverse()
-							.map(i => (
-								<button
-									data-target="BB"
-									className={i === bbsSelected ? 'active' : ''}
-									onClick={handleSelection}
-									value={i}
-								>
-									{i}
-								</button>
-							))}
+						{Array.from({ length: 19 }, (x, i) => i + 2).map(i => (
+							<button
+								data-target="BB"
+								className={i === parseInt(bbsSelected) ? 'active' : ''}
+								onClick={handleSelection}
+								value={i}
+							>
+								{i}
+							</button>
+						))}
 					</div>
 				</div>
 				<div className="selector-push">
@@ -298,7 +298,7 @@ export const PushPositionStack = () => {
 			<div className="flex-container">
 				<div className="row content-container">
 					<>
-						<CardTable />
+						<CardTable isLoading={isLoading} />
 						<InfoContainer data={{ ...range?.info, avg }} />
 						{flatRanges.length > 0 && (
 							<div className="flat-container">

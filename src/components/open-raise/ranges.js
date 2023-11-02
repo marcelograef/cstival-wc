@@ -1,11 +1,6 @@
-import { TableState } from '@src/store/branches/table/interfaces';
-
-export interface TableStateData {
-	[key: string]: TableState;
-}
 
 //TODO: calculate AVG
-export const ranges: TableStateData = {
+export const ranges = {
 	'UTG-1': {
 		raise: 'A9s+,KTs+,QTs+,A5s,JTs+,T9s+,98s+,66+,AQ+',
 		info: { span01: 'BBs: 30+', span02: 'OR: 2.25x' }
