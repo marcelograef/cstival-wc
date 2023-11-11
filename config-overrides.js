@@ -41,13 +41,7 @@ module.exports = {
     config.output.filename = './static/js/main.js';
     config.output.publicPath = '';
 
-    console.log('\n');
-    console.log('\n');
-    console.log('\n');
-    console.log('ESTOY');
-    console.log('\n');
-    console.log('\n');
-    console.log('\n');
+
     /*
 		config.output.chunkFilename = `js/[id].bundle.js?v=${buildHash}`;
 		config.plugins.push(

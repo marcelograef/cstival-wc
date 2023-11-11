@@ -4,7 +4,6 @@ import './index.scss';
 import Button from '../button';
 
 const InfoContainer = ({ data, isEditable, onChange, handleAddMessage }) => {
-	console.log({ data });
 	const { messages, ...infoInput } = data;
 	const [info] = useState(data);
 

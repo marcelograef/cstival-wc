@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useEffect, useState } from 'react';
-import { getData, getRealPositionShort } from '../../utilities';
+import { getData, getRealPositionROL, getRealPositionShort } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo';
 import { CardTable, InfoContainer } from '../index';
 import './index.scss';
@@ -36,8 +36,8 @@ export const ROL = () => {
 						indexYP = positionsArray.indexOf(p);
 
 
-						let realYourPos = getRealPositionShort(indexYP);
-						realYourPos = realYourPos === 'HJ' ? 'HJ-' : realYourPos;
+						const realYourPos = getRealPositionROL(indexYP);
+
 						setTableValues(initialState);
 						setIsLoading(true);
 						getData('ROL', `${realYourPos}`).then(rangeData => {

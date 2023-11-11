@@ -7,9 +7,6 @@ const url = process.env.REACT_APP_API_URL;
 
 
 const getData = async (key, situation) => {
-	console.log({ url, key, situation });
-
-
 	return axios
 		.get(`${url}/ranges`, {
 			params: {

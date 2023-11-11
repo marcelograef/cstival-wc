@@ -79,7 +79,6 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 								.map((c, i) => {
 									const index1 = cards.indexOf(v[1]);
 									const index2 = cards.indexOf(v[5]);
-									console.log(v[1], v[4]);
 									if (i >= index1 && i <= index2) {
 										return `${v[0]}${c}s`;
 									}
@@ -93,7 +92,6 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 								.map((c, i) => {
 									const index1 = cards.indexOf(v[1]);
 									const index2 = cards.indexOf(v[4]);
-									console.log(v[1], v[4]);
 									if (i >= index1 && i <= index2) {
 										return `${v[0]}${c}`;
 									}

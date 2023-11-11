@@ -134,13 +134,11 @@ export const PushPositionStack = () => {
   };
 
   const handleSelection = (event) => {
-    console.log({ event });
     const {
       value,
       dataset: { target },
     } = event.target;
-    console.log({ target });
-    console.log({ value });
+
 
     switch (target) {
       case 'BB':
@@ -156,13 +154,11 @@ export const PushPositionStack = () => {
   };
 
   const handleSliderChange = (event) => {
-    console.log({ event });
     const {
       value,
       dataset: { target },
     } = event.target;
-    console.log({ target });
-    console.log({ value });
+
 
 	switch (target) {
     case 'BB':
@@ -178,7 +174,6 @@ export const PushPositionStack = () => {
   };
 
   useEffect(() => {
-    console.log({ positionSelected, bbsSelected });
     if (bbsSelected && positionSelected) {
       let flag = false;
       const auxRanges = [];
@@ -215,9 +210,7 @@ export const PushPositionStack = () => {
   const loadRange = (rangeSelector, index) => {
     setTableValues(initialState);
     setFlatSelected(index);
-    console.log('Range selector');
-    console.log(rangeSelector.replace('+', '').replace(/\s/, ''));
-    console.log('Range selector');
+
     setIsLoading(true);
     getData('PUSH', rangeSelector.replace('+', '').replace(/\s/, '')).then(
       (rangeData) => {
