@@ -53,12 +53,13 @@ export const ResponseOR = () => {
 							indexVP = positionsArray.indexOf(p);
 						}
 
-
-
 						const realYourPos = getRealPositionLong(indexYP);
 						const realVillainPos = getRealPositionLong(indexVP);
 						setTableValues(initialState);
+
+						if (yourPosition === '' || villainPosition === '') return;
 						setIsLoading(true);
+
 						getData('ROR', `${realYourPos}|${realVillainPos}`).then(rangeData => {
 							setRange(rangeData);
 							setTableValues(rangeData);

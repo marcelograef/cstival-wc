@@ -10,7 +10,7 @@ import { initialState } from '../../constants.js';
 
 export const Response3Bet = () => {
 	const { setTableValues } = useContext(MyContext);
-		const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [yourPosition, setYourPosition] = useState('');
 	const [villainPosition, setVillainPosition] = useState('');
@@ -66,12 +66,15 @@ export const Response3Bet = () => {
 							setSbAction('');
 						}
 						setTableValues(initialState);
-						setIsLoading(true)
-						setIsLoading(true)
+
+						if (yourPosition === '' || villainPosition === '') return;
+
+						setIsLoading(true);
+
 						getData('RES3', `${realYourPos}|${realVillainPos}`).then(rangeData => {
 							setRange(rangeData);
 							setTableValues(rangeData);
-							setIsLoading(false)
+							setIsLoading(false);
 						});
 					}}
 				>
@@ -80,7 +83,6 @@ export const Response3Bet = () => {
 			);
 		});
 	};
-
 
 	const sbVsBbOptions = () => {
 		const indexYP = positionsArray.indexOf(yourPosition);
@@ -92,11 +94,14 @@ export const Response3Bet = () => {
 		const onClick = action => {
 			setSbAction(action);
 			setTableValues(initialState);
-			setIsLoading(true)
+
+			if (yourPosition === '' || villainPosition === '') return;
+			setIsLoading(true);
+			
 			getData('RES3', `${realYourPos}|${realVillainPos}|${action}`).then(rangeData => {
 				setRange(rangeData);
 				setTableValues(rangeData);
-				setIsLoading(false)
+				setIsLoading(false);
 			});
 		};
 		return (

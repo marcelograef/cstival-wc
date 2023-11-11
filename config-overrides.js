@@ -1,5 +1,5 @@
 require('dotenv').config();
-const exec = require('child_process').exec;
+
 const fs = require('fs');
 const path = require('path');
 
@@ -8,16 +8,16 @@ const Handlebars = require('handlebars');
 const readline = require('readline');
 
 async function getFirstLine(pathToFile) {
-	const readable = fs.createReadStream(pathToFile, 'utf8');
-	const reader = readline.createInterface({ input: readable });
-	const line = await new Promise(resolve => {
-		reader.on('line', line => {
-			reader.close();
-			resolve(line);
-		});
-	});
-	readable.close();
-	return line;
+  const readable = fs.createReadStream(pathToFile, 'utf8');
+  const reader = readline.createInterface({ input: readable });
+  const line = await new Promise((resolve) => {
+    reader.on('line', (line) => {
+      reader.close();
+      resolve(line);
+    });
+  });
+  readable.close();
+  return line;
 }
 
 //var uniqid = require('uniqid');
@@ -27,20 +27,28 @@ async function getFirstLine(pathToFile) {
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-	webpack: function (config, env) {
-		console.log('env', env);
+  webpack: function (config, env) {
+    console.log('env', env);
 
-		if (env !== 'production') {
-			return config;
-		}
-		config.entry = './src/index_build.js';
-		/*
+    if (env !== 'production') {
+      return config;
+    }
+    config.entry = './src/index_build.js';
+    /*
 		const buildHash = uniqid();
 */
 
-		config.output.filename = './static/js/main.js';
-		config.output.publicPath = '';
-		/*
+    config.output.filename = './static/js/main.js';
+    config.output.publicPath = '';
+
+    console.log('\n');
+    console.log('\n');
+    console.log('\n');
+    console.log('ESTOY');
+    console.log('\n');
+    console.log('\n');
+    console.log('\n');
+    /*
 		config.output.chunkFilename = `js/[id].bundle.js?v=${buildHash}`;
 		config.plugins.push(
 			new FileManagerPlugin({
@@ -52,44 +60,46 @@ module.exports = {
 
 		config.plugins.push(new HtmlWebPackPlugin());
 		*/
-		config.plugins.push(
-			new MiniCssExtractPlugin({
-				filename: './static/css/main.css'
-			})
-		);
+    config.plugins.push(
+      new MiniCssExtractPlugin({
+        filename: 'static/css/main.css',
+      })
+    );
 
-		config.plugins.push({
-			apply: compiler => {
-				compiler.hooks.afterEmit.tap('AfterEmitPlugin', async compilation => {
-					const { emittedAssets } = compilation;
+    config.plugins.push({
+      apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('AfterEmitPlugin', async (compilation) => {
+          const { emittedAssets } = compilation;
 
-					const folderPath = './build/static';
-					const jsPath = './js/main.js'; // Replace with your actual output path
-					const cssPath = './css/main.css'; // Replace with your actual output path
-					const bundlePath = `${folderPath}/bundle.js`; // Replace with your actual output jsFile
+          const folderPath = './build/static';
+          const jsPath = './js/main.js'; // Replace with your actual output path
+          const cssPath = './css/main.css'; // Replace with your actual output path
+          const bundlePath = `${folderPath}/bundle.js`; // Replace with your actual output jsFile
 
-					const jsOutput = path.join(folderPath, jsPath);
-					const cssOutput = path.join(folderPath, cssPath);
-					const outputFileContent = fs.readFileSync(jsOutput, 'utf8');
-					const cssContent = await getFirstLine(cssOutput);
+          const jsOutput = path.join(folderPath, jsPath);
+          const cssOutput = path.join(folderPath, cssPath);
+          const outputFileContent = fs.readFileSync(jsOutput, 'utf8');
+          const cssContent = await getFirstLine(cssOutput);
 
-					const template = Handlebars.compile(outputFileContent);
+          const template = Handlebars.compile(outputFileContent);
 
-					let contents = template({ css_to_replace: `'${cssContent}'` });
-					contents = contents.replace(`"'.`, `'.`).replace(`'";`, `';`);
+          let contents = template({ css_to_replace: `'${cssContent}'` });
+          contents = contents.replace(`"'.`, `'.`).replace(`'";`, `';`);
 
-					fs.writeFile(bundlePath, contents, 'utf8', err => {
-						if (err) {
-							return console.error(`Autsch! Failed to store template: ${err.message}.`);
-						}
+          fs.writeFile(bundlePath, contents, 'utf8', (err) => {
+            if (err) {
+              return console.error(
+                `Autsch! Failed to store template: ${err.message}.`
+              );
+            }
 
-						console.log('Saved template!');
-					});
+            console.log('Saved template!');
+          });
 
-					console.log('Web component build completed successfully.');
-				});
-			}
-		});
-		return config;
-	}
+          console.log('Web component build completed successfully.');
+        });
+      },
+    });
+    return config;
+  },
 };
