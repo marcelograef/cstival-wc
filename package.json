@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "env-cmd -f .env.development react-app-rewired start",
-    "build": "env-cmd -f ./.env react-app-rewired build",
+    "build": "env-cmd -f .env react-app-rewired build",
     "test": "craco test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
