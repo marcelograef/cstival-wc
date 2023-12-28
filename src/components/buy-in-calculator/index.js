@@ -20,10 +20,13 @@ const BuyInCalculator = () => {
 	const calculateBuyIn = (roi, field) =>
 		bankroll / factors.find(factor => factor.roi === roi && factor.field === field)?.factor || 0;
 
-	const calculateAverage = factors =>
-		(factors.reduce((sum, factor) => sum + calculateBuyIn(factor.roi, factor.field), 0) / factors.length).toFixed(
-			1
-		);
+	const calculateAverage = roi =>
+		(
+			factors
+				.filter(factor => factor.roi === roi)
+				.reduce((sum, factor) => sum + calculateBuyIn(factor.roi, factor.field), 0) /
+			factors.filter(factor => factor.roi === roi).length
+		).toFixed(1);
 
 	const generateRow = roi => (
 		<div className="grid-row" key={roi}>
@@ -33,7 +36,7 @@ const BuyInCalculator = () => {
 				.map(factor => (
 					<div key={factor.field}>{`$${calculateBuyIn(roi, factor.field).toFixed(1)}`}</div>
 				))}
-			<div className={`roi-${roi}`}>${calculateAverage(factors)}</div>
+			<div className={`roi-${roi}`}>${calculateAverage(roi)}</div>
 		</div>
 	);
 
@@ -48,9 +51,9 @@ const BuyInCalculator = () => {
 				</div>
 				<div className="header">
 					<div>ROI</div>
-					<div>Fields CHICOS (100 jug)</div>
-					<div>Fields MEDIOS (200 jug)</div>
-					<div>Fields GRANDES (1000 jug)</div>
+					<div className='small-fields'>Fields CHICOS (100 jug)</div>
+					<div className='medium-fields'>Fields MEDIOS (200 jug)</div>
+					<div className='big-fields'>Fields GRANDES (1000 jug)</div>
 					<div>Promedio (Grilla mixeada)</div>
 				</div>
 

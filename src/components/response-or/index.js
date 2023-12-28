@@ -15,6 +15,9 @@ export const ResponseOR = () => {
 	const [range, setRange] = useState({ info: {} });
 	const [isLoading, setIsLoading] = useState(false);
 
+	const [realYourPos, setRealYourPos] = useState(null);
+	const [realVillainPos, setRealVillainPos] = useState(null);
+
 	const [yourPosition, setYourPosition] = useState('');
 	const [villainPosition, setVillainPosition] = useState('');
 
@@ -53,18 +56,9 @@ export const ResponseOR = () => {
 							indexVP = positionsArray.indexOf(p);
 						}
 
-						const realYourPos = getRealPositionLong(indexYP);
-						const realVillainPos = getRealPositionLong(indexVP);
-						setTableValues(initialState);
+						setRealYourPos(getRealPositionLong(indexYP));
 
-						if (yourPosition === '' || villainPosition === '') return;
-						setIsLoading(true);
-
-						getData('ROR', `${realYourPos}|${realVillainPos}`).then(rangeData => {
-							setRange(rangeData);
-							setTableValues(rangeData);
-							setIsLoading(false);
-						});
+						setRealVillainPos(getRealPositionLong(indexVP));
 					}}
 				>
 					{p}
@@ -72,6 +66,20 @@ export const ResponseOR = () => {
 			);
 		});
 	};
+
+	useEffect(() => {
+		setTableValues(initialState);
+
+		if (yourPosition === '' || villainPosition === '') return;
+		setIsLoading(true);
+
+		getData('ROR', `${realYourPos}|${realVillainPos}`).then(rangeData => {
+			setRange(rangeData);
+			setTableValues(rangeData);
+			setIsLoading(false);
+		});
+	}, [yourPosition, realVillainPos]);
+
 	return (
 		<div className="selector-container">
 			<div className="selector-body">

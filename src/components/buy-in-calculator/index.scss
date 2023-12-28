@@ -1,8 +1,8 @@
 // BuyInCalculator.scss
 
-$roi-10: rgb(233, 135, 223);
-$roi-20: rgb(120, 178, 133);
-$roi-30: rgb(237, 117, 65);
+$roi-10: #ebd5e8;
+$roi-20: #b8ddaa;
+$roi-30: #f1aa85;
 
 .calc-container {
 	display: flex;
@@ -26,6 +26,16 @@ $roi-30: rgb(237, 117, 65);
 		text-align: center;
 		border-bottom: 1px solid #ccc;
 		padding: 8px;
+
+		.small-fields {
+			background-color: #dcedd5;
+		}
+		.medium-fields {
+			background-color: #cfdfe6;
+		}
+		.big-fields {
+			background-color: #fae2d6;
+		}
 
 		div {
 			padding: 8px;

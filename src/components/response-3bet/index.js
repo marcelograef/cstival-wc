@@ -12,6 +12,9 @@ export const Response3Bet = () => {
 	const { setTableValues } = useContext(MyContext);
 	const [isLoading, setIsLoading] = useState(false);
 
+	const [realYourPos, setRealYourPos] = useState(null);
+	const [realVillainPos, setRealVillainPos] = useState(null);
+
 	const [yourPosition, setYourPosition] = useState('');
 	const [villainPosition, setVillainPosition] = useState('');
 	const [sbAction, setSbAction] = useState('');
@@ -60,22 +63,8 @@ export const Response3Bet = () => {
 							indexVP = positionsArray.indexOf(p);
 						}
 
-						const realYourPos = getRealPositionLong(indexYP);
-						const realVillainPos = getRealPositionLong(indexVP);
-						if (!(yourPosition === 'SB' && villainPosition === 'BB')) {
-							setSbAction('');
-						}
-						setTableValues(initialState);
-
-						if (yourPosition === '' || villainPosition === '') return;
-
-						setIsLoading(true);
-
-						getData('RES3', `${realYourPos}|${realVillainPos}`).then(rangeData => {
-							setRange(rangeData);
-							setTableValues(rangeData);
-							setIsLoading(false);
-						});
+						setRealYourPos(getRealPositionLong(indexYP));
+						setRealVillainPos(getRealPositionLong(indexVP));
 					}}
 				>
 					{p}
@@ -95,9 +84,9 @@ export const Response3Bet = () => {
 			setSbAction(action);
 			setTableValues(initialState);
 
-			if (yourPosition === '' || villainPosition === '') return;
+			if (yourPosition === '' || realVillainPos === '') return;
 			setIsLoading(true);
-			
+
 			getData('RES3', `${realYourPos}|${realVillainPos}|${action}`).then(rangeData => {
 				setRange(rangeData);
 				setTableValues(rangeData);
@@ -121,6 +110,25 @@ export const Response3Bet = () => {
 			</>
 		);
 	};
+
+	useEffect(() => {
+		if (!(yourPosition === 'SB' && realVillainPos === 'BB')) {
+			setSbAction('');
+		}
+		setTableValues(initialState);
+
+		if (!(yourPosition === '' || realVillainPos === '')) {
+			setIsLoading(true);
+
+			getData('RES3', `${realYourPos}|${realVillainPos}`)
+				.then(rangeData => {
+					setRange(rangeData);
+					setTableValues(rangeData);
+					setIsLoading(false);
+				})
+				.catch(e => setIsLoading(false));
+		}
+	}, [yourPosition, realVillainPos]);
 	return (
 		<div className="selector-container">
 			<div className="selector-body">

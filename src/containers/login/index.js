@@ -12,6 +12,7 @@ import { Wrapper } from '../../components';
 function LoginForm() {
 	const [user, setUsername] = useState('');
 	const [password, setPassword] = useState('');
+	const [processing, setProcessing] = useState(false);
 
 	const [cookies, setCookie, removeCookie] = useCookies(['user']);
 	const [data, setData] = useState();
@@ -32,6 +33,7 @@ function LoginForm() {
 		console.log('Password:', password);
 
 		try {
+			setProcessing(true);
 			const res = await login({
 				user,
 				password
@@ -53,6 +55,7 @@ function LoginForm() {
 			console.log({ error });
 			emitCustomEvent('cs-login', { user: null });
 		}
+		setProcessing(false);
 	};
 
 	return (
@@ -73,7 +76,9 @@ function LoginForm() {
 							onChange={e => setPassword(e.target.value)}
 						/>
 					</div>
-					<button type="submit">Login</button>
+					<button type="submit" disabled={processing} className={processing ? 'disable' : ''}>
+						{processing ? 'Procesando...' : 'Login'}
+					</button>
 				</form>
 			</div>
 		</div>

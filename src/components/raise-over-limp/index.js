@@ -11,6 +11,8 @@ export const ROL = () => {
 	const { tableValues, setTableValues } = useContext(MyContext);
 	const [isLoading, setIsLoading] = useState(false);
 
+	const [realYourPos, setRealYourPos] = useState('');
+
 	const [yourPosition, setYourPosition] = useState('');
 	const [range, setRange] = useState({ info: {} });
 	const [avg, setAvg] = useState(null);
@@ -35,16 +37,7 @@ export const ROL = () => {
 						setYourPosition(p);
 						indexYP = positionsArray.indexOf(p);
 
-
-						const realYourPos = getRealPositionROL(indexYP);
-
-						setTableValues(initialState);
-						setIsLoading(true);
-						getData('ROL', `${realYourPos}`).then(rangeData => {
-							setRange(rangeData);
-							setTableValues(rangeData);
-							setIsLoading(false);
-						});
+						setRealYourPos(getRealPositionROL(indexYP));
 					}}
 				>
 					{p}
@@ -52,6 +45,18 @@ export const ROL = () => {
 			);
 		});
 	};
+
+	useEffect(() => {
+		if (realYourPos !== '') {
+			setTableValues(initialState);
+			setIsLoading(true);
+			getData('ROL', `${realYourPos}`).then(rangeData => {
+				setRange(rangeData);
+				setTableValues(rangeData);
+				setIsLoading(false);
+			});
+		}
+	}, [realYourPos]);
 	return (
 		<div className="selector-container">
 			<div className="selector-body">{getPositions()}</div>
