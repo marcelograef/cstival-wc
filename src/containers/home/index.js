@@ -8,7 +8,8 @@ import {
 	ROL,
 	Response3Bet,
 	ResponseOR,
-	Wrapper
+	Wrapper,
+	BuyInCalculator
 } from '../../components/index.js';
 //import { useTranslation } from 'react-i18next';
 import { initialState } from '../../constants.js';
@@ -44,6 +45,9 @@ const Home = ({ user }) => {
 					<h4 className={`${draw === 'PUSH' ? 'active' : ''}`} onClick={() => onClick('PUSH')}>
 						Push por Pos. y Stack
 					</h4>
+					<h4 className={`${draw === 'CALC' ? 'active' : ''}`} onClick={() => onClick('CALC')}>
+						Calculadora Buy-In
+					</h4>
 					{ user === 'cstival' &&
 					<h4 className={`${draw === 'LOAD' ? 'active' : ''}`} onClick={() => onClick('LOAD')}>
 						Load Range
@@ -56,6 +60,7 @@ const Home = ({ user }) => {
 					{draw === 'RES3' && <Response3Bet />}
 					{draw === 'ROL' && <ROL />}
 					{draw === 'PUSH' && <PushPositionStack />}
+					{draw === 'CALC' && <BuyInCalculator />}
 					{draw === 'LOAD' && user === 'cstival' && <LoadRange />}
 				</div>
 			</div>

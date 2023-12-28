@@ -13,3 +13,4 @@ export { default as Response3Bet } from './response-3bet/index.js';
 export { default as ResponseOR } from './response-or/index.js';
 export { default as Spinner } from './spinner/index.js';
 export { default as Wrapper } from './wrapper/index.js';
+export { default as BuyInCalculator } from './buy-in-calculator/index.js';

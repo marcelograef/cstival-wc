@@ -1,0 +1,80 @@
+// BuyInCalculator.scss
+
+$roi-10: rgb(233, 135, 223);
+$roi-20: rgb(120, 178, 133);
+$roi-30: rgb(237, 117, 65);
+
+.calc-container {
+	display: flex;
+
+	height: 100vh;
+
+	flex-direction: column;
+
+	.bankroll {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		text-align: center;
+		align-items: center;
+		padding: 20px 0;
+	}
+
+	.header {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		text-align: center;
+		border-bottom: 1px solid #ccc;
+		padding: 8px;
+
+		div {
+			padding: 8px;
+			border: 1px solid #ccc;
+		}
+	}
+
+	.input-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		margin-bottom: 10px;
+	}
+
+	.grid {
+		display: grid;
+		gap: 8px;
+
+		text-align: center;
+
+		.grid-row {
+			display: grid;
+			grid-template-columns: repeat(5, 1fr);
+			border: 1px solid #cccccc;
+			padding: 8px;
+
+			.roi-10 {
+				background-color: $roi-10;
+			}
+			.roi-20 {
+				background-color: $roi-20;
+			}
+			.roi-30 {
+				background-color: $roi-30;
+			}
+
+			&:nth-child(odd) {
+				background-color: #f0f0f0;
+			}
+
+			div {
+				padding: 8px;
+				border: 1px solid #ccc;
+			}
+		}
+	}
+
+	input {
+		width: 60px;
+		padding: 4px;
+		margin-left: 8px;
+	}
+}
