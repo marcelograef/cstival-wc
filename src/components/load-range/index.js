@@ -100,7 +100,7 @@ export const LoadRange = () => {
         ...tableValues,
         info: {
           ...tableValues.info,
-          messages: tableValues.info.messages.filter((m) => m.trim() !== ''),
+          messages: tableValues.info?.messages?.filter((m) => m.trim() !== ''),
         },
       });
       console.log(res);

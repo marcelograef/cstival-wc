@@ -5,8 +5,10 @@ import axios from 'axios';
 
 const url = process.env.REACT_APP_API_URL;
 
-
+console.log({url})
 const getData = async (key, situation) => {
+
+	console.log({key, situation});
 	return axios
 		.get(`${url}/ranges`, {
 			params: {
@@ -16,7 +18,10 @@ const getData = async (key, situation) => {
 		})
 		.then(r => {
 			try {
+
+				console.log({r})
 				const { bluff, call, raise, fold, info } = r.data[0];
+				console.log({ bluff, call, raise, fold, info });
 				const tableState = {
 					bluff,
 					call,
@@ -24,6 +29,7 @@ const getData = async (key, situation) => {
 					fold,
 					info: JSON.parse(info.replace(/'/g, '"'))
 				};
+				console.log({ tableState });
 				return tableState;
 			} catch (error) {
 				console.log({ error });

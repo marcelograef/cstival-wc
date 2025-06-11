@@ -4,6 +4,9 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const port = process.env.PORT || 3000;
 
+
+console.log(`PORT: ${port}`)
+
 module.exports = {
 	mode: 'development',
 	entry: './src/index.js',

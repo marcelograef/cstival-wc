@@ -8,11 +8,10 @@ import MyContext from '../../context';
 import { initialState } from '../../constants.js';
 import Spinner from '../spinner';
 
-const OpenRaise = ({ setControlsContent, setInfo }) => {
+const useOpenRaise = ({ setControlsContent, setInfo }) => {
 	const { tableValues, setTableValues, setIsLoading } = useContext(MyContext);
 	const [clickPos, setClickPos] = useState('');
 	const [avg, setAvg] = useState(null);
-
 
 	const [selected, setSelected] = useState('');
 	const [range, setRange] = useState(initialState);
@@ -20,10 +19,10 @@ const OpenRaise = ({ setControlsContent, setInfo }) => {
 	useEffect(() => {
 		const res = calculateAvg(range);
 		setAvg(res);
-		setInfo({...res, betSize: range?.info?.span02})
+		setInfo({ ...res, betSize: range?.info?.span02 });
 	}, [range]);
 
-	const handleClick = (pos) => {
+	const handleClick = pos => {
 		if (pos) {
 			setTableValues(initialState);
 			setIsLoading(true);
@@ -38,7 +37,6 @@ const OpenRaise = ({ setControlsContent, setInfo }) => {
 	};
 
 	useEffect(() => {
-
 		setControlsContent(
 			getPositionsComponent({
 				situation: 'OpenRaise',
@@ -47,8 +45,6 @@ const OpenRaise = ({ setControlsContent, setInfo }) => {
 			})
 		);
 	}, [selected]);
-
-
 };
 
-export default OpenRaise;
+export default useOpenRaise;

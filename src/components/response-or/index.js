@@ -9,7 +9,10 @@ import './index.scss';
 import MyContext from '../../context';
 import { initialState } from '../../constants.js';
 
-export const ResponseOR = () => {
+import { getPositionsComponent } from '../../utilities/getPositionsComponent';
+
+
+export const ResponseOR = ({ setControlsContent }) => {
 	const { tableValues, setTableValues } = useContext(MyContext);
 	const [avg, setAvg] = useState(null);
 	const [range, setRange] = useState({ info: {} });
@@ -29,7 +32,7 @@ export const ResponseOR = () => {
 	const getPositions = (player = '') => {
 		const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
 		const positionsArray = positions.split(',');
-		return positionsArray.map(p => {
+		return positionsArray.map((p, i) => {
 			let active = '';
 			if (player) {
 				active = yourPosition === p ? 'active' : '';
@@ -38,34 +41,94 @@ export const ResponseOR = () => {
 			}
 
 			return (
-				<button
-					className={`selector ${active}`}
-					key={p}
-					disabled={
-						player && positionsArray.indexOf(p) - 1 < positionsArray.indexOf(villainPosition) ? true : false
-					}
-					onClick={() => {
-						let indexYP = positionsArray.indexOf(yourPosition);
-						let indexVP = positionsArray.indexOf(villainPosition);
-						if (player === 'you') {
-							setYourPosition(p);
-							indexYP = positionsArray.indexOf(p);
-							if (positionsArray.indexOf(p) - 1 < indexVP) setVillainPosition('');
-						} else {
-							setVillainPosition(p);
-							indexVP = positionsArray.indexOf(p);
+				<>
+					<div
+						key={i}
+						className={`position-btn ${active}`}
+						data-opener={p}
+						key={p}
+						disabled={
+							player && positionsArray.indexOf(p) - 1 < positionsArray.indexOf(villainPosition)
+								? true
+								: false
 						}
+						onClick={() => handleClick(player, p)}
+					>
+						{p.toUpperCase()}
+					</div>
+					{/* <button
+						className={`selector ${active}`}
+						key={p}
+						disabled={
+							player && positionsArray.indexOf(p) - 1 < positionsArray.indexOf(villainPosition)
+								? true
+								: false
+						}
+						onClick={() => {
+							let indexYP = positionsArray.indexOf(yourPosition);
+							let indexVP = positionsArray.indexOf(villainPosition);
+							if (player === 'you') {
+								setYourPosition(p);
+								indexYP = positionsArray.indexOf(p);
+								if (positionsArray.indexOf(p) - 1 < indexVP) setVillainPosition('');
+							} else {
+								setVillainPosition(p);
+								indexVP = positionsArray.indexOf(p);
+							}
 
-						setRealYourPos(getRealPositionLong(indexYP));
+							setRealYourPos(getRealPositionLong(indexYP));
 
-						setRealVillainPos(getRealPositionLong(indexVP));
-					}}
-				>
-					{p}
-				</button>
+							setRealVillainPos(getRealPositionLong(indexVP));
+						}}
+					>
+						{p}
+					</button> */}
+				</>
 			);
 		});
 	};
+
+	const handleClick = (player, p) => {
+		const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
+		const positionsArray = positions.split(',');
+		let indexYP = positionsArray.indexOf(yourPosition);
+		let indexVP = positionsArray.indexOf(villainPosition);
+
+		if (player === 'you') {
+			setYourPosition(p);
+			indexYP = positionsArray.indexOf(p);
+			if (positionsArray.indexOf(p) - 1 < indexVP) setVillainPosition('');
+		} else {
+			setVillainPosition(p);
+			indexVP = positionsArray.indexOf(p);
+		}
+
+		setRealYourPos(getRealPositionLong(indexYP));
+
+		setRealVillainPos(getRealPositionLong(indexVP));
+	};
+
+	useEffect(() => {
+		/* setControlsContent(
+			<>
+				<div className="position-group">{getPositions()}</div>
+				<div className="vs-label">vs</div>
+				<div className="position-group">{getPositions('you')}</div>
+			</>
+		); */
+
+		setControlsContent(
+			getPositionsComponent({
+				situation: 'ResponseOR',
+
+				yourPosition,
+				villainPosition,
+				onClick: handleClick
+			})
+		);
+
+
+	}, [villainPosition, yourPosition]);
 
 	useEffect(() => {
 		setTableValues(initialState);
@@ -80,24 +143,7 @@ export const ResponseOR = () => {
 		});
 	}, [yourPosition, realVillainPos]);
 
-	return (
-		<div className="selector-container">
-			<div className="selector-body">
-				<span className="selector label">OR</span>
-				{getPositions()}
-			</div>
-			<div className="selector-body">
-				<span className="selector label">Hero</span>
-				{getPositions('you')}
-			</div>
-			<div className="flex-container">
-				<div className="row content-container">
-					<CardTable isLoading={isLoading} />
-					<InfoContainer data={{ ...range?.info, avg }} />
-				</div>
-			</div>
-		</div>
-	);
+
 };
 
 export default ResponseOR;

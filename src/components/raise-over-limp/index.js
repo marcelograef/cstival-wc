@@ -7,7 +7,10 @@ import './index.scss';
 import MyContext from '../../context';
 import { initialState } from '../../constants.js';
 
-export const ROL = () => {
+import { getPositionsComponent } from '../../utilities/getPositionsComponent';
+
+
+export const ROL = ({ setControlsContent }) => {
 	const { tableValues, setTableValues } = useContext(MyContext);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -46,6 +49,8 @@ export const ROL = () => {
 		});
 	};
 
+	const handleClick = () => {};
+
 	useEffect(() => {
 		if (realYourPos !== '') {
 			setTableValues(initialState);
@@ -57,17 +62,45 @@ export const ROL = () => {
 			});
 		}
 	}, [realYourPos]);
-	return (
-		<div className="selector-container">
-			<div className="selector-body">{getPositions()}</div>
-			<div className="flex-container">
-				<div className="row content-container">
-					<CardTable isLoading={isLoading} />
-					<InfoContainer data={{ ...range?.info, avg }} />
-				</div>
-			</div>
-		</div>
-	);
+
+	useEffect(() => {
+		const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
+		const positionsArray = positions.split(',');
+
+		/* setControlsContent(
+			positionsArray.map((pos, i) => {
+				const active = yourPosition === pos ? 'active' : '';
+
+				return (
+					<div
+						key={i}
+						className={`position-btn ${pos === realYourPos ? 'active' : ''}`}
+						data-position={pos}
+						onClick={() => {
+							let indexYP = positionsArray.indexOf(yourPosition);
+							setYourPosition(pos);
+							indexYP = positionsArray.indexOf(pos);
+
+							setRealYourPos(getRealPositionROL(indexYP));
+						}}
+					>
+						{pos.toUpperCase()}
+					</div>
+				);
+			})
+		); */
+		setControlsContent(
+			getPositionsComponent({
+				situation: 'ROL',
+				selected: yourPosition,
+				onClick: pos => {
+					setYourPosition(pos);
+					setRealYourPos(getRealPositionROL(positionsArray.indexOf(pos)));
+				}
+			})
+		);
+	}, [realYourPos]);
+
 };
 
 export default ROL;

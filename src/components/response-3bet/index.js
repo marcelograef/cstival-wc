@@ -3,12 +3,15 @@ import { useEffect, useState } from 'react';
 import { CardTable, InfoContainer } from '../index';
 import './index.scss';
 
+import { getPositionsComponent } from '../../utilities/getPositionsComponent';
+
+
 import { getData, getRealPositionLong } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo';
 import MyContext from '../../context';
 import { initialState } from '../../constants.js';
 
-export const Response3Bet = () => {
+export const Response3Bet = ({ setControlsContent }) => {
 	const { setTableValues } = useContext(MyContext);
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -47,8 +50,9 @@ export const Response3Bet = () => {
 			}
 
 			return (
-				<button
-					className={`selector ${active}`}
+				<div
+					className={`position-btn ${active}`}
+					data-threetbet={p}
 					key={p}
 					disabled={disabled}
 					onClick={() => {
@@ -68,7 +72,25 @@ export const Response3Bet = () => {
 					}}
 				>
 					{p}
-				</button>
+				</div>
+				/**
+				 *
+				 * <div className="position-group">
+							{['utg1', 'mp', 'lj', 'hj', 'co', 'bu', 'sb', 'bb'].map((pos, i) => (
+								<div key={i} className={`position-btn ${i === 0 ? 'active' : ''}`} data-threetbet={pos}>
+									{pos.toUpperCase()}
+								</div>
+							))}
+						</div>
+						<div className="vs-label">vs</div>
+						<div className="position-group">
+							{['utg', 'utg1', 'mp', 'lj', 'hj', 'co', 'bu', 'sb'].map((pos, i) => (
+								<div key={i} className={`position-btn ${i === 0 ? 'active' : ''}`} data-original={pos}>
+									{pos.toUpperCase()}
+								</div>
+							))}
+						</div>
+				 */
 			);
 		});
 	};
@@ -129,25 +151,49 @@ export const Response3Bet = () => {
 				.catch(e => setIsLoading(false));
 		}
 	}, [yourPosition, realVillainPos]);
-	return (
-		<div className="selector-container">
-			<div className="selector-body">
-				<span className="selector label">OR</span> {getPositions('you')}
-			</div>
-			<div className="selector-body">
-				<span className="selector label">3Bet</span> {getPositions()}
-			</div>
-			{yourPosition === 'SB' && villainPosition === 'BB' && (
-				<div className="selector-body">{sbVsBbOptions()}</div>
-			)}
-			<div className="flex-container">
-				<div className="row content-container">
-					<CardTable isLoading={isLoading} />
-					<InfoContainer data={{ ...range?.info, avg }} />
-				</div>
-			</div>
-		</div>
-	);
+
+
+	const handleClick = (player, p) => {
+		let indexYP = positionsArray.indexOf(yourPosition);
+		let indexVP = positionsArray.indexOf(villainPosition);
+		if (player === 'you') {
+			setYourPosition(p);
+			indexYP = positionsArray.indexOf(p);
+			if (positionsArray.indexOf(p) - 1 < indexVP) setVillainPosition('');
+		} else {
+			setVillainPosition(p);
+			indexVP = positionsArray.indexOf(p);
+		}
+
+		setRealYourPos(getRealPositionLong(indexYP));
+		setRealVillainPos(getRealPositionLong(indexVP));
+	};
+
+	useEffect(() => {
+		setControlsContent(
+			getPositionsComponent({
+				situation: 'Response3Bet',
+
+				yourPosition,
+				villainPosition,
+				onClick: handleClick
+			})
+		);
+		/* setControlsContent(
+			<>
+				<div className="position-group">{getPositions()}</div>
+				<div className="vs-label">vs</div>
+				<div className="position-group">{getPositions('you')}</div>
+			</>
+		); */
+	}, [villainPosition, yourPosition]);
+
+	/* return (
+		<>
+			<CardTable isLoading={isLoading} />
+			<InfoContainer data={{ ...range?.info, avg }} />
+		</>
+	); */
 };
 
 export default Response3Bet;

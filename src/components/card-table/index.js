@@ -10,8 +10,13 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 
 	const [mouseDown, setMouseDown] = useState(false);
 
+	const [activeCard, setActiveCard] = useState(null);
+
+
 	const onClick = combo => {
+		console.log("click--");
 		if (isEditable && actionToAdd) {
+			console.log("click--02");
 			let value;
 			const cards = 'AKQJT98765432';
 
@@ -243,6 +248,8 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 	};
 
 	const generateGrid = combosObjectParam => {
+
+
 		if (!combosObjectParam) {
 			setTableValues(initialState);
 			combosObjectParam = initialState;
@@ -261,6 +268,7 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 			}
 		}
 
+		console.log({ combosObjectParam });
 		const combosObjectAux = [
 			{ key: 'call', value: combosObjectParam['call'] },
 			{ key: 'fold', value: combosObjectParam['fold'] },
@@ -349,6 +357,8 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 					key={index}
 					suited={suited}
 					action={action}
+					isActive={activeCard === index}
+					onActivate={() => setActiveCard(activeCard === index ? null : index)}
 					onMouseDown={() => onClick(c)}
 					onMouseEnter={() => onMouseEnter(c)}
 					actionToAdd={actionToAdd}
@@ -360,7 +370,7 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 	};
 
 	return (
-		<div className="grid-container" onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
+		<div className="poker-grid" onMouseDown={onMouseDown} onMouseUp={onMouseUp}>
 			{generateGrid(tableValues)}
 		</div>
 	);
