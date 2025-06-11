@@ -6,6 +6,15 @@ export const getPositionsComponent = ({
 	yourPosition,
 	villainPosition
 }) => {
+
+	console.group('getPositionsComponent');
+	console.log({situation,
+		positions,
+		selected,
+		onClick,
+		yourPosition,
+		villainPosition})
+		console.groupEnd();
 	const positionsArray = positions.split(',');
 	const isVersus = ['ResponseOR', 'Response3Bet'].includes(situation);
 
@@ -33,6 +42,13 @@ export const getPositionsComponent = ({
 				);
 			});
 
+			console.log(
+				<>
+					<div className="position-group">{renderGroup(false)}</div>
+					<div className="vs-label">vs</div>
+					<div className="position-group">{renderGroup(true)}</div>
+				</>
+			);
 		return (
 			<>
 				<div className="position-group">{renderGroup(false)}</div>
@@ -42,6 +58,17 @@ export const getPositionsComponent = ({
 		);
 	}
 
+
+	console.log(positionsArray.map((pos, i) => (
+		<div
+			key={i}
+			className={`position-btn ${pos === selected ? 'active' : ''}`}
+			data-position={pos}
+			onClick={() => onClick(pos)}
+		>
+			{pos.toUpperCase()}
+		</div>
+	)))
 	// Basic rendering for OpenRaise, ROL, etc.
 	return positionsArray.map((pos, i) => (
 		<div

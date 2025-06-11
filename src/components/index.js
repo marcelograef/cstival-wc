@@ -2,7 +2,7 @@ export { default as Button } from './button/index.js';
 
 //export { default as Card } from './card/index.js';
 export { default as CardTable } from './card-table/index.js';
-export { default as SituationHandler } from './situation-handler/index.js';
+
 export { default as LoadRange } from './load-range/index.js';
 export { default as Field } from './field/index.js';
 //export { default as Home } from './home/index.js';

@@ -10,6 +10,8 @@ import {
 	BuyInCalculator,
 	CardTable
 } from '../../components/index.js';
+
+import SituationHandler from '../../components/Situations/SituationHandler'
 import { initialState } from '../../constants.js';
 import MyContext from '../../context.js';
 import './index.scss';
@@ -21,7 +23,12 @@ const Home = ({ user }) => {
 	const [stack, setStack] = useState('');
 
 
+
+
+
+	const [selectedSituation, setSelectedSituation] = useState('OpenRaise');
 	const [controls, setControlsContent] = useState(null);
+
 
 	const [activeCategory, setActiveCategory] = useState('openraising');
 
@@ -38,20 +45,23 @@ const Home = ({ user }) => {
 		console.log({info})
 	},[info])
 
-	const onClick = (layout, category) => {
-		setDraw(layout);
-		setActiveCategory(category);
+	const onClick = item => {
+		setDraw(item.layout);
+		setActiveCategory(item.category);
+		setSelectedSituation(item.situation);
 		setTableValues(initialState);
 	};
 
 	const renderTabs = [
-		{ label: 'Open Raise', layout: 'OR', category: 'openraising' },
-		{ label: 'Respuesta al OR', layout: 'ROR', category: 'respuesta-or' },
-		{ label: 'Respuesta 3Bet', layout: 'RES3', category: 'respuesta-3bet' },
-		{ label: 'ROL', layout: 'ROL', category: 'raise-over-limp' },
-		{ label: 'Push por Stack', layout: 'PUSH', category: 'push-stack' },
-		{ label: 'Calculadora Buy-In', layout: 'CALC', category: 'CALC' }
+		{ label: 'Open Raise', layout: 'OR', category: 'openraising' , situation: 'OpenRaise'},
+		{ label: 'Respuesta al OR', layout: 'ROR', category: 'respuesta-or' , situation: 'ResponseOR'},
+		{ label: 'Respuesta 3Bet', layout: 'RES3', category: 'respuesta-3bet' , situation: 'Response3Bet'},
+		{ label: 'ROL', layout: 'ROL', category: 'raise-over-limp' , situation: 'ROL'},
+		{ label: 'Push por Stack', layout: 'PUSH', category: 'push-stack' , situation: 'PushPositionStack'},
+		{ label: 'Calculadora Buy-In', layout: 'CALC', category: 'CALC', situation: '' }
 	];
+
+
 	const activeTab = renderTabs.find(i => i.layout === draw);
 
 	const userRestriction = user === 'cstival' || true;
@@ -68,12 +78,12 @@ const Home = ({ user }) => {
 				</div>
 
 				<div className="main-tabs">
-					{renderTabs.map(({ label, layout, category }) => (
+					{renderTabs.map(({ label, layout, category, situation }) => (
 						<div
 							key={layout}
 							className={`main-tab ${draw === layout ? 'active' : ''}`}
 							data-category={category}
-							onClick={() => onClick(layout, category)}
+							onClick={() => onClick({ layout, category, situation })}
 						>
 							{label}
 						</div>
@@ -94,23 +104,32 @@ const Home = ({ user }) => {
 						))}
 					</div>
 
-					<div
+					{/* <div
 						className="position-controls"
 						id="openraise-controls"
 						style={{ display: activeCategory === 'openraising' ? 'flex' : 'none' }}
 					>
-						{/** content to change fro OpenRaise*/}
+
 						{openRaiseContent}
+					</div> */}
+					<div className="position-controls" id="openraise-controls" style={{ display: 'flex' }}>
+						{/** content to change fro OpenRaise*/}
+						<SituationHandler
+							situation={selectedSituation}
+							setControlsContent={setControlsContent}
+							setInfo={setInfo}
+						/>
+						{controls}
 					</div>
-					{draw === 'OR' && <OpenRaise setControlsContent={setOpenRaiseContent} setInfo={setInfo} />}
+					{/* {draw === 'OR' && <OpenRaise setControlsContent={setOpenRaiseContent} setInfo={setInfo} />}
 					{draw === 'ROR' && <ResponseOR setControlsContent={setRorContent} />}
 					{draw === 'RES3' && <Response3Bet setControlsContent={setBet3Content} />}
 					{draw === 'ROL' && <ROL setControlsContent={setRolContent} />}
 					{draw === 'PUSH' && <PushPositionStack setControlsContent={setPushContent} />}
 					{draw === 'CALC' && <BuyInCalculator />}
-					{draw === 'LOAD' && userRestriction && <LoadRange />}
+					{draw === 'LOAD' && userRestriction && <LoadRange />} */}
 
-					<div
+					{/* <div
 						className="position-controls"
 						id="respuesta-or-controls"
 						style={{ display: activeCategory === 'respuesta-or' ? 'flex' : 'none' }}
@@ -131,7 +150,7 @@ const Home = ({ user }) => {
 						style={{ display: activeCategory === 'raise-over-limp' ? 'flex' : 'none' }}
 					>
 						{rolContent}
-					</div>
+					</div> */}
 				</div>
 				<div class="current-selection">
 					<h3 id="selection-title">
