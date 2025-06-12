@@ -35,7 +35,7 @@ const Home = ({ user }) => {
 			onlyTable: false
 		}
 	];
-	if (user === 'cstival' || true) {
+	if (user === 'cstival') {
 		renderTabs.push({ label: 'Load Range', layout: 'LOAD', category: 'load-range', situation: 'LoadRange' });
 	}
 
