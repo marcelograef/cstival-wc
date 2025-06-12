@@ -3,24 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { MyContextProvider } from './context.js';
 import Home from './containers/home/index.js';
 
-import { CookiesProvider, useCookies, Cookies } from 'react-cookie';
+import { CookiesProvider, useCookies } from 'react-cookie';
 import LoginForm from './containers/login/index.js';
 
 import { useCustomEventListener } from 'react-custom-events';
 
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { Spinner } from './components/index.js';
 
 const App = () => {
-	let [cookies, setCookie, removeCookie] = useCookies();
+	let [cookies, setCookie] = useCookies();
 	const [user, setUser] = useState();
 
 	const [loading, setLoading] = useState(true);
-
-	const checkUser = () => {
-		const data = cookies['user'];
-		setUser(data);
-	};
 
 	useEffect(() => {
 		/* setCookie('user', 'test');
@@ -28,7 +23,7 @@ const App = () => {
 		const data = cookies['user'];
 		setUser(data);
 		setLoading(false);
-	}, []);
+	}, [cookies]);
 
 	// const { t } = useTranslation();
 

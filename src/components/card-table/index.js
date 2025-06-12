@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import MyContext from '../../context';
 import Card from '../card/index';
 import './index.scss';
@@ -12,11 +12,8 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 
 	const [activeCard, setActiveCard] = useState(null);
 
-
 	const onClick = combo => {
-		console.log("click--");
 		if (isEditable && actionToAdd) {
-			console.log("click--02");
 			let value;
 			const cards = 'AKQJT98765432';
 
@@ -70,7 +67,7 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 								.map((c, i) => {
 									const index1 = cards.indexOf(v[0]);
 									const index2 = cards.indexOf(v[3]);
-									// console.log({ index1, index2 });
+
 									if (index1 <= i && index2 >= i) {
 										return `${c}${c}`;
 									}
@@ -110,14 +107,11 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 				})
 				.join(',');
 
-			// console.log({ previous });
 			try {
 				value = [...previous.split(',').filter(value => value !== ''), combo].join(',');
 			} catch (error) {
 				value = combo;
 			}
-
-			// console.log({ value });
 
 			const pairs = value
 				.split(',')
@@ -148,7 +142,7 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 					return c;
 				})
 				.join(',');
-			// console.log({ pairs });
+
 			const suiteds = value
 				.split(',')
 				.filter(c => c.includes('s'))
@@ -248,8 +242,6 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 	};
 
 	const generateGrid = combosObjectParam => {
-
-
 		if (!combosObjectParam) {
 			setTableValues(initialState);
 			combosObjectParam = initialState;
@@ -268,7 +260,6 @@ export const CardTable = ({ isEditable = false, actionToAdd, isLoading = false }
 			}
 		}
 
-		console.log({ combosObjectParam });
 		const combosObjectAux = [
 			{ key: 'call', value: combosObjectParam['call'] },
 			{ key: 'fold', value: combosObjectParam['fold'] },

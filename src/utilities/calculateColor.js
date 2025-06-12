@@ -1,10 +1,12 @@
+export const colorMap = {
+	allIn: 'rgb(125, 31, 31)',
+	raise: 'rgb(240, 60, 60)',
+	call: 'rgb(90, 185, 102)',
+	fold: 'rgb(61, 124, 184)'
+};
+
 export function getRangeCellStyle({ allIn = 0, raise = 0, call = 0, fold = 0 }) {
-	const colorMap = {
-		allIn: 'rgb(125, 31, 31)',
-		raise: 'rgb(240, 60, 60)',
-		call: 'rgb(90, 185, 102)',
-		fold: 'rgb(61, 124, 184)'
-	};
+
 
 	let layers = [];
 

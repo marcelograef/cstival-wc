@@ -7,15 +7,14 @@ import { toast } from 'react-toastify';
 import { emitCustomEvent } from 'react-custom-events';
 
 import './index.scss';
-import { Wrapper } from '../../components';
 
 function LoginForm() {
 	const [user, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [processing, setProcessing] = useState(false);
 
-	const [cookies, setCookie, removeCookie] = useCookies(['user']);
-	const [data, setData] = useState();
+	const [cookies, setCookie,] = useCookies(['user']);
+	//const [data, setData] = useState();
 
 	/* useEffect(() => {
 		setCookie('user', 'test');

@@ -6,30 +6,29 @@ import axios from 'axios';
 const url = process.env.REACT_APP_API_URL;
 
 console.log({url})
-const getData = async (key, situation) => {
+const getData = async (situation_type, range_key, effective_stack) => {
 
-	console.log({key, situation});
+	console.log({ situation_type, range_key, effective_stack });
 	return axios
 		.get(`${url}/ranges`, {
 			params: {
-				key,
-				situation
+				situation_type,
+				range_key,
+				effective_stack: effective_stack.replace(/[a-zA-Z]/g, '')
 			}
 		})
 		.then(r => {
 			try {
-
-				console.log({r})
-				const { bluff, call, raise, fold, info } = r.data[0];
-				console.log({ bluff, call, raise, fold, info });
+				console.log({ r });
+				const { notes, ...rest } = r.data[0];
+				console.log({ notes, ...rest });
 				const tableState = {
-					bluff,
-					call,
-					raise,
-					fold,
-					info: JSON.parse(info.replace(/'/g, '"'))
+					...rest,
+					notes: JSON.parse(notes.replace(/'/g, '"'))
 				};
+				console.log('***************');
 				console.log({ tableState });
+				console.log('***************');
 				return tableState;
 			} catch (error) {
 				console.log({ error });

@@ -5,10 +5,11 @@
   "scripts": {
     "start": "env-cmd -f .env.development react-app-rewired start",
     "build": "env-cmd -f .env react-app-rewired build",
+    "build:wc": "webpack --config webpack.config.js --mode production",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "predeploy": "npm run build:wc",
+    "deploy": "gh-pages -d dist"
   },
   "eslintConfig": {
     "extends": [

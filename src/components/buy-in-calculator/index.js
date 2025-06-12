@@ -41,26 +41,44 @@ const BuyInCalculator = () => {
 	);
 
 	return (
-		<div className="calc-container">
+		<div className="">
+			<div className="cs-container">
+				<div className="header">
+					<h1>Calculadora de Buy-In</h1>
+					<p>Ajusta según tu bankroll y expectativas de ROI</p>
+				</div>
 
-				<div className='bankroll'>
-					<div>BANKROLL:</div>
-					<div>
-						<input type="number" value={bankroll} onChange={e => setBankroll(e.target.value)} />
+				<div className="controls-section">
+					<div className="bankroll">
+						<div>
+							<strong>BANKROLL:</strong>
+						</div>
+						<div>
+							<input
+								type="number"
+								value={bankroll}
+								onChange={e => setBankroll(e.target.value)}
+								className="bankroll-input"
+							/>
+						</div>
 					</div>
 				</div>
-				<div className="header">
-					<div>ROI</div>
-					<div className='small-fields'>Fields CHICOS (100 jug)</div>
-					<div className='medium-fields'>Fields MEDIOS (200 jug)</div>
-					<div className='big-fields'>Fields GRANDES (1000 jug)</div>
-					<div>Promedio (Grilla mixeada)</div>
+
+				<div className="grid">
+					<div className="grid-row header">
+						<div>ROI</div>
+						<div className="small-fields">100 Jug.</div>
+						<div className="medium-fields">200 Jug.</div>
+						<div className="big-fields">1000 Jug.</div>
+						<div>Promedio</div>
+					</div>
+
+					{[10, 20, 30].map(roi => generateRow(roi))}
 				</div>
-
-				<div className="grid">{[10, 20, 30].map(roi => generateRow(roi))}</div>
-
+			</div>
 		</div>
 	);
+
 };
 
 export default BuyInCalculator;

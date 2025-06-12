@@ -4,17 +4,16 @@ import { CardTable, InfoContainer } from '../index';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { initialState } from '../../constants.js';
 import MyContext from '../../context';
-import { getData, getRealPositionShort } from '../../utilities';
+import { getData } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo';
 import './index.scss';
 //import { ranges } from './ranges';
 
 export const PushPositionStack = () => {
-	const { tableValues, setTableValues } = useContext(MyContext);
+	const { setTableValues } = useContext(MyContext);
 
 	const [isLoading, setIsLoading] = useState(false);
 
-	const [yourPosition, setYourPosition] = useState('');
 	const [selectedCell, setSelectedCell] = useState({ row: '', column: '' });
 	const [flatRanges, setFaltRanges] = useState([]);
 	const [flatSelected, setFlatSelected] = useState(-1);
@@ -42,7 +41,7 @@ export const PushPositionStack = () => {
 	const gridElement = useRef(null);
 
 	const gridHoveredCellDataAddressAtt = 'data-hovered-cell-address';
-	const gridSelectedCellDataAddressAtt = 'data-selected-cell-address';
+	//const gridSelectedCellDataAddressAtt = 'data-selected-cell-address';
 	const cellDataAddressRow = 'data-row';
 	const cellDataAddressCol = 'data-column';
 
@@ -167,7 +166,7 @@ export const PushPositionStack = () => {
 				setIsLoading(false);
 			});
 		}
-	}, [positionSelected, bbsSelected]);
+	}, [positionSelected, bbsSelected, positionsArray, setTableValues]);
 
 	const loadRange = (rangeSelector, index) => {
 		setTableValues(initialState);
