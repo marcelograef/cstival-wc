@@ -2,9 +2,6 @@
 
 set -e  # Exit immediately if a command fails
 
-echo "🔨 Building the project..."
-npm run build
-
 echo "🚀 Switching to gh-pages branch..."
 git checkout gh-pages
 
@@ -23,7 +20,5 @@ git commit -m "Manual deploy"
 echo "📡 Pushing to origin gh-pages..."
 git push origin gh-pages --force
 
-echo "🔙 Switching back to main..."
-git checkout main
 
 echo "✅ Deploy complete!"
