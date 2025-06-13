@@ -10,7 +10,7 @@ export function useRangeSituation({
 	situationType,
 	setControlsContent,
 	effectiveStack,
-	setInfo,
+	setNotes,
 	playerType,
 	yourPosition,
 	villainPosition,
@@ -21,10 +21,10 @@ export function useRangeSituation({
 	const [range, setRange] = useState(initialState);
 
 	useEffect(() => {
-		if (!range?.info) return;
+		if (!range?.notes) return;
 		const avg = calculateAvg(range);
-		setInfo?.({ ...avg, betSize: range?.info?.span02 });
-	}, [range, setInfo]);
+		setNotes?.({ ...avg, betSize: range?.notes?.span02 });
+	}, [range, setNotes]);
 
 	const handleClick = useCallback(
 		pos => {

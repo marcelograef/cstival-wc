@@ -6,7 +6,7 @@ import { getPositionsComponent } from '../utilities/getPositionsComponent';
 import { initialState } from '../constants';
 import MyContext from '../context';
 
-export function useSituation({ type, setControlsContent, setInfo }) {
+export function useSituation({ type, setControlsContent, setNotes }) {
 	const { setTableValues, setIsLoading } = useContext(MyContext);
 
 	const [yourPosition, setYourPosition] = useState('');
@@ -16,8 +16,8 @@ export function useSituation({ type, setControlsContent, setInfo }) {
 
 	useEffect(() => {
 		const res = calculateAvg(range);
-		if (setInfo) {
-			setInfo({ ...res, betSize: range?.info?.span02 });
+		if (setNotes) {
+			setNotes({ ...res, betSize: range?.notes?.span02 });
 		}
 		setAvg(res);
 	}, [range]);

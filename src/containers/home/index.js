@@ -47,7 +47,7 @@ const Home = ({ user }) => {
 	const [selectedPositions, setSelectedPositions] = useState('');
 	const [controls, setControlsContent] = useState(null);
 
-	const [info, setInfo] = useState(null);
+	const [notes, setNotes] = useState(null);
 
 	const onClick = tab => {
 		setSelectedTab(tab);
@@ -104,7 +104,7 @@ const Home = ({ user }) => {
 							effectiveStack={stack}
 							setSelectedPositions={setSelectedPositions}
 							setControlsContent={setControlsContent}
-							setInfo={setInfo}
+							setNotes={setNotes}
 						/>
 						{controls}
 					</div>
@@ -149,15 +149,15 @@ const Home = ({ user }) => {
 
 				<section className="stats">
 					<div className="stat-item">
-						<div className="stat-number">{info?.totalAvg}</div>
+						<div className="stat-number">{notes?.totalAvg}</div>
 						<div className="stat-label">Rango de Apertura</div>
 					</div>
 					<div className="stat-item">
-						<div className="stat-number">{info?.totalUsedCombos}</div>
+						<div className="stat-number">{notes?.totalUsedCombos}</div>
 						<div className="stat-label">Combos</div>
 					</div>
 					<div className="stat-item">
-						<div className="stat-number">{info?.betSize?.split(':')[1]}</div>
+						<div className="stat-number">{notes?.betSize?.split(':')[1]}</div>
 						<div className="stat-label">Tamaño de Bet</div>
 					</div>
 				</section>

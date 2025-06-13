@@ -1,12 +1,12 @@
 // src/components/Situations/GenericSituation.js
 import { useRangeSituation } from '../../hooks/useRangeSituation';
 
-const GenericSituation = ({ situationType,effectiveStack, setControlsContent, setInfo, setSelectedPositions }) => {
+const GenericSituation = ({ situationType,effectiveStack, setControlsContent, setNotes, setSelectedPositions }) => {
 	useRangeSituation({
 		situationType,
 		setControlsContent,
 		effectiveStack,
-		setInfo,
+		setNotes,
 		setSelectedPositions
 	});
 	return null;

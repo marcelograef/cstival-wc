@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { useEffect, useState } from 'react';
 import { getData, getRealPositionLong, getRealPositionROL, saveRange } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo.js';
-import { Button, CardTable, Field, InfoContainer } from '../index';
+import { Button, CardTable, Field, infoContainer } from '../index';
 import './index.scss';
 import '../push-position-stack/index.scss';
 import MyContext from '../../context';
@@ -56,17 +56,17 @@ export const LoadRange = () => {
 		} = event;
 
 		if (name.includes('span')) {
-			const { info } = tableValues;
-			setTableValues({ ...tableValues, info: { ...info, [name]: value } });
+			const { notes } = tableValues;
+			setTableValues({ ...tableValues, notes: { ...notes, [name]: value } });
 		} else if (name.includes('messages')) {
-			const { info } = tableValues;
-			const { messages } = info;
+			const { notes } = tableValues;
+			const { messages } = notes;
 
 			const [, index, isButton] = name.split('-');
 
 			messages[index] = isButton ? '' : value;
 
-			setTableValues({ ...tableValues, info: { ...info, messages: messages } });
+			setTableValues({ ...tableValues, notes: { ...notes, messages: messages } });
 		} else {
 			setTableValues({ ...tableValues, [name]: value });
 		}
@@ -86,9 +86,9 @@ export const LoadRange = () => {
 				key,
 				situation,
 				...tableValues,
-				info: {
-					...tableValues.info,
-					messages: tableValues.info?.messages?.filter(m => m.trim() !== '')
+				notes: {
+					...tableValues.notes,
+					messages: tableValues.notes?.messages?.filter(m => m.trim() !== '')
 				}
 			});
 
@@ -97,7 +97,7 @@ export const LoadRange = () => {
 			}
 		} catch (error) {
 			if (error.code === 'ERR_BAD_REQUEST') {
-				toast.info(error?.response?.data.message);
+				toast.notes(error?.response?.data.message);
 			} else {
 				toast.error(error.message);
 			}
@@ -394,8 +394,8 @@ export const LoadRange = () => {
 	};
 
 	const handleAddMessage = () => {
-		const messages = [...tableValues.info.messages, ''];
-		setTableValues({ ...tableValues, info: { ...tableValues.info, messages } });
+		const messages = [...tableValues.notes.messages, ''];
+		setTableValues({ ...tableValues, notes: { ...tableValues.notes, messages } });
 	};
 
 	return (
@@ -502,8 +502,8 @@ export const LoadRange = () => {
 			<div className="flex-container">
 				<div className="row content-container">
 					<CardTable actionToAdd={actionToAdd} isEditable={true} />
-					<InfoContainer
-						data={{ ...tableValues?.info, avg }}
+					<notesContainer
+						data={{ ...tableValues?.notes, avg }}
 						isEditable={true}
 						onChange={onChange}
 						handleAddMessage={handleAddMessage}
