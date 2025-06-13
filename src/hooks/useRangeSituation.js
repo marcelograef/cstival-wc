@@ -1,10 +1,10 @@
 // src/hooks/useRangeSituation.js
 import { useEffect, useState, useContext, useCallback } from 'react';
-import { getData } from '../utilities';
-import { calculateAvg } from '../utilities/calculateInfo';
+import { getData } from '../services/api/api-requests';
+import { calculateAvg } from '../utils/calculations/calculateInfo';
 import { PositionsComponent } from './PositionsComponent';
-import MyContext from '../context';
-import { initialState } from '../constants';
+import MyContext from '../context/context';
+import { initialState } from '../utils/constants/constants';
 
 export function useRangeSituation({
 	situationType,

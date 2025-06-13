@@ -1,15 +1,15 @@
 // App.js (or any other high-level component)
 import React, { useEffect, useState } from 'react';
-import Home from './containers/home/index.js';
-import { MyContextProvider } from './context.js';
+import Home from './components/features/containers/home/index.js';
+import { MyContextProvider } from './context/context.js';
 
 import { CookiesProvider, useCookies } from 'react-cookie';
-import LoginForm from './containers/login/index.js';
+import LoginForm from './components/features/containers/login/index.js';
 
 import { useCustomEventListener } from 'react-custom-events';
 
 import { ToastContainer } from 'react-toastify';
-import { Spinner } from './components/index.js';
+import { Spinner } from './components/common/Spinner/index.js';
 
 const App = () => {
 	let [cookies, setCookie] = useCookies();

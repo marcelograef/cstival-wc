@@ -3,7 +3,7 @@ import r2wc from '@r2wc/react-to-web-component';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import './assets/styles/index.scss';
+import './assets/styles/base/index.scss';
 
 import App from './App.js';
 
