@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo, useCallback } from 'react';
 import { useEffect, useState } from 'react';
 import { getData, getRealPositionLong, getRealPositionROL, saveRange } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo.js';
@@ -14,43 +14,122 @@ import 'react-toastify/dist/ReactToastify.css';
 const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
 const positionsArray = positions.split(',');
 
+// Separate component for position selectors
+const PositionSelector = ({ position, active, onClick, disabled = false }) => (
+	<button
+		className={`selector ${active ? 'active' : ''}`}
+		disabled={disabled}
+		onClick={onClick}
+	>
+		{position}
+	</button>
+);
+
+// Separate component for range fields
+const RangeFields = ({ tableValues, onChange, onClick, errors, clearFunction, actionToAdd }) => (
+	<div className="selector-body range-fields">
+		<Field
+			register={{ onChange, onClick }}
+			type="text"
+			name="raise"
+			label="Raise Range"
+			error={errors.raise}
+			placeholder="Raise Range"
+			value={tableValues?.raise}
+			clear={true}
+			clearFunction={() => clearFunction('raise')}
+			actionToAdd={actionToAdd}
+		/>
+		<Field
+			register={{ onChange, onClick }}
+			type="text"
+			name="call"
+			label="Call Range"
+			error={errors.call}
+			placeholder="Call Range"
+			value={tableValues?.call}
+			clear={true}
+			clearFunction={() => clearFunction('call')}
+			actionToAdd={actionToAdd}
+		/>
+		<Field
+			register={{ onChange, onClick }}
+			type="text"
+			name="bluff"
+			label="Bluff Range"
+			error={errors.bluff}
+			placeholder="Bluff Range"
+			value={tableValues?.bluff}
+			clear={true}
+			clearFunction={() => clearFunction('bluff')}
+			actionToAdd={actionToAdd}
+		/>
+		<Field
+			register={{ onChange, onClick }}
+			type="text"
+			name="fold"
+			label="Fold Range"
+			error={errors.fold}
+			placeholder="Fold Range"
+			value={tableValues?.fold}
+			clear={true}
+			clearFunction={() => clearFunction('fold')}
+			actionToAdd={actionToAdd}
+		/>
+	</div>
+);
+
+// Separate component for menu buttons
+const MenuButtons = ({ key, handleMenu }) => (
+	<div className="button-container spaced">
+		<Button className={key === 'OR' ? 'selected' : ''} onClick={() => handleMenu('OR')}>
+			Open Raise
+		</Button>
+		<Button className={key === 'ROR' ? 'selected' : ''} onClick={() => handleMenu('ROR')}>
+			Respuesta vs OR
+		</Button>
+		<Button className={key === 'RES3' ? 'selected' : ''} onClick={() => handleMenu('RES3')}>
+			Respuesta 3Bet
+		</Button>
+		<Button className={key === 'ROL' ? 'selected' : ''} onClick={() => handleMenu('ROL')}>
+			ROL
+		</Button>
+		<Button className={key === 'PUSH' ? 'selected' : ''} onClick={() => handleMenu('PUSH')}>
+			Push por Pos. y Stack
+		</Button>
+	</div>
+);
+
 export const LoadRange = () => {
 	const { tableValues, setTableValues } = useContext(MyContext);
 
 	const [range, setRange] = useState(initialState);
-
 	const [flatRanges, setFaltRanges] = useState([]);
 	const [flatSelected, setFlatSelected] = useState(-1);
-
 	const [avg, setAvg] = useState(null);
+	const [sbAction, setSbAction] = useState('');
+	const [key, setKey] = useState('');
+	const [situation, setSituation] = useState('');
+	const [actionToAdd, setActionToAdd] = useState('');
+	const [yourPosition, setYourPosition] = useState('');
+	const [villainPosition, setVillainPosition] = useState('');
+	const [bbsSelected, setBbsSelected] = useState('');
+	const [positionSelected, setPositionSelected] = useState('');
+	const [effectiveStack, setEffectiveStack] = useState(100); // Default to 100BB
+	const [errors] = useState({ call: '', raise: '', bluff: '', fold: '' });
 
 	useEffect(() => {
 		const res = calculateAvg(range);
 		setAvg(res);
 	}, [range]);
 
-	const [sbAction, setSbAction] = useState('');
-
-	//const [range] = useState({});
-
-	const [key, setKey] = useState('');
-	const [situation, setSituation] = useState('');
-	const [actionToAdd, setActionToAdd] = useState('');
-
-	const [yourPosition, setYourPosition] = useState('');
-	const [villainPosition, setVillainPosition] = useState('');
-
-	const [bbsSelected, setBbsSelected] = useState('');
-	const [positionSelected, setPositionSelected] = useState('');
-
-	const [errors] = useState({ call: '', raise: '', bluff: '', fold: '' });
-
 	useEffect(() => {
 		const res = calculateAvg(tableValues);
 		setAvg(res);
 	}, [tableValues]);
 
-	const onChange = event => {
+	// Memoized handlers
+	const onChange = useCallback(event => {
 		const {
 			target: { name, value }
 		} = event;
@@ -61,16 +140,13 @@ export const LoadRange = () => {
 		} else if (name.includes('messages')) {
 			const { notes } = tableValues;
 			const { messages } = notes;
-
 			const [, index, isButton] = name.split('-');
-
 			messages[index] = isButton ? '' : value;
-
 			setTableValues({ ...tableValues, notes: { ...notes, messages: messages } });
 		} else {
 			setTableValues({ ...tableValues, [name]: value });
 		}
-	};
+	}, [tableValues, setTableValues]);
 
 	const onClick = event => {
 		const {
@@ -80,11 +156,12 @@ export const LoadRange = () => {
 		setActionToAdd(name);
 	};
 
-	const handleSave = async () => {
+	const handleSave = useCallback(async () => {
 		try {
 			const res = await saveRange({
 				key,
 				situation,
+				effectiveStack,
 				...tableValues,
 				notes: {
 					...tableValues.notes,
@@ -97,60 +174,53 @@ export const LoadRange = () => {
 			}
 		} catch (error) {
 			if (error.code === 'ERR_BAD_REQUEST') {
-				toast.notes(error?.response?.data.message);
+				toast.error(error?.response?.data.message);
 			} else {
 				toast.error(error.message);
 			}
 		}
-	};
+	}, [key, situation, effectiveStack, tableValues]);
 
-	const getPositionsOR = () => {
-		const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB';
-
-		return positions.split(',').map(p => (
-			<button
-				className={`selector ${p === situation ? 'active' : ''}`}
+	// Memoized position selectors
+	const positionsOR = useMemo(() => {
+		return positionsArray.slice(0, -1).map(p => (
+			<PositionSelector
 				key={p}
+				position={p}
+				active={p === situation}
 				onClick={() => {
 					setSituation(p);
 					setTableValues(initialState);
-
-					getData('OR', p).then(rangeData => {
+					getData('OR', p, effectiveStack).then(rangeData => {
 						setRange(rangeData);
-
 						setTableValues(rangeData);
-						//setSelected(p);
 					});
 				}}
-			>
-				{p}
-			</button>
+			/>
 		));
-	};
+	}, [situation, setTableValues]);
 
-	const getPositionsROR = (player = '') => {
+	const getPositionsROR = useCallback((player = '') => {
 		return positionsArray.map(p => {
-			let active = '';
-			if (player) {
-				active = yourPosition === p ? 'active' : '';
-			} else {
-				active = villainPosition === p ? 'active' : '';
-			}
+			const active = player ? yourPosition === p : villainPosition === p;
+			const disabled = player && positionsArray.indexOf(p) - 1 < positionsArray.indexOf(villainPosition);
 
 			return (
-				<button
-					className={`selector ${active}`}
+				<PositionSelector
 					key={p}
-					disabled={
-						player && positionsArray.indexOf(p) - 1 < positionsArray.indexOf(villainPosition) ? true : false
-					}
+					position={p}
+					active={active}
+					disabled={disabled}
 					onClick={() => {
 						let indexYP = positionsArray.indexOf(yourPosition);
 						let indexVP = positionsArray.indexOf(villainPosition);
+
 						if (player === 'you') {
 							setYourPosition(p);
 							indexYP = positionsArray.indexOf(p);
-							if (positionsArray.indexOf(p) - 1 < indexVP) setVillainPosition('');
+							if (positionsArray.indexOf(p) - 1 < indexVP) {
+								setVillainPosition('');
+							}
 						} else {
 							setVillainPosition(p);
 							indexVP = positionsArray.indexOf(p);
@@ -160,47 +230,42 @@ export const LoadRange = () => {
 						const realVillainPos = getRealPositionLong(indexVP);
 						setSituation(`${realYourPos}|${realVillainPos}`);
 						setTableValues(initialState);
-						getData('ROR', `${realYourPos}|${realVillainPos}`).then(rangeData => {
-							setRange(rangeData);
-							setTableValues(rangeData);
-						});
+
+						if (realYourPos && realVillainPos) {
+							getData('ROR', `${realYourPos}|${realVillainPos}`).then(rangeData => {
+								setRange(rangeData);
+								setTableValues(rangeData);
+							});
+						}
 					}}
-				>
-					{p}
-				</button>
+				/>
 			);
 		});
-	};
+	}, [yourPosition, villainPosition, setTableValues]);
 
-	const getPositionsRes3 = (player = '') => {
+	const getPositionsRes3 = useCallback((player = '') => {
 		return positionsArray.map(p => {
-			let active = '';
-			if (player) {
-				active = yourPosition === p ? 'active' : '';
-			} else {
-				active = villainPosition === p ? 'active' : '';
-			}
-
-			let disabled;
-			if ((!player && p.includes('UTG')) || (player && p === 'BB')) {
-				disabled = true;
-			} else {
-				disabled =
-					!player && positionsArray.indexOf(yourPosition) > positionsArray.indexOf(p) - 1 ? true : false;
-			}
+			const active = player ? yourPosition === p : villainPosition === p;
+			const disabled = (!player && p.includes('UTG')) ||
+							(player && p === 'BB') ||
+							(!player && positionsArray.indexOf(yourPosition) > positionsArray.indexOf(p) - 1);
 
 			return (
-				<button
-					className={`selector ${active}`}
+				<PositionSelector
 					key={p}
+					position={p}
+					active={active}
 					disabled={disabled}
 					onClick={() => {
 						let indexYP = positionsArray.indexOf(yourPosition);
 						let indexVP = positionsArray.indexOf(villainPosition);
+
 						if (player === 'you') {
 							setYourPosition(p);
 							indexYP = positionsArray.indexOf(p);
-							if (positionsArray.indexOf(p) - 1 < indexVP) setVillainPosition('');
+							if (positionsArray.indexOf(p) - 1 < indexVP) {
+								setVillainPosition('');
+							}
 						} else {
 							setVillainPosition(p);
 							indexVP = positionsArray.indexOf(p);
@@ -208,86 +273,79 @@ export const LoadRange = () => {
 
 						const realYourPos = getRealPositionLong(indexYP);
 						const realVillainPos = getRealPositionLong(indexVP);
+
 						if (!(yourPosition === 'SB' && villainPosition === 'BB')) {
 							setSbAction('');
 						}
 
 						setSituation(`${realYourPos}|${realVillainPos}`);
 						setTableValues(initialState);
-						if (!!realYourPos && !!realVillainPos) {
+
+						if (realYourPos && realVillainPos) {
 							getData('RES3', `${realYourPos}|${realVillainPos}`).then(rangeData => {
 								setRange(rangeData);
 								setTableValues(rangeData);
 							});
 						}
 					}}
-				>
-					{p}
-				</button>
+				/>
 			);
 		});
-	};
+	}, [yourPosition, villainPosition, setTableValues]);
 
-	const sbVsBbOptions = () => {
+	const getPositionsROL = useCallback(() => {
+		return positionsArray.map(p => (
+			<PositionSelector
+				key={p}
+				position={p}
+				active={yourPosition === p}
+				onClick={() => {
+					const indexYP = positionsArray.indexOf(p);
+					const realYourPos = getRealPositionROL(indexYP);
+
+					setYourPosition(p);
+					setTableValues(initialState);
+
+					getData('ROL', `${realYourPos}`).then(rangeData => {
+						setRange(rangeData);
+						setTableValues(rangeData);
+					});
+
+					setSituation(`${realYourPos}`);
+				}}
+			/>
+		));
+	}, [yourPosition, setTableValues]);
+
+	const sbVsBbOptions = useCallback(() => {
 		const indexYP = positionsArray.indexOf(yourPosition);
 		const indexVP = positionsArray.indexOf(villainPosition);
 
 		const realYourPos = getRealPositionLong(indexYP);
 		const realVillainPos = getRealPositionLong(indexVP);
 
-		const onClick = action => {
+		const handleAction = (action) => {
 			setSbAction(action);
 			setSituation(`${realYourPos}|${realVillainPos}|${action}`);
 		};
+
 		return (
 			<>
-				<button
-					className={`selector ${sbAction === '3Bet' ? 'active' : ''} not-circle`}
-					onClick={() => onClick('3Bet')}
-				>
-					Respuesta a 3Bet
-				</button>
-				<button
-					className={`selector ${sbAction === 'ROL' ? 'active' : ''} not-circle`}
-					onClick={() => onClick('ROL')}
-				>
-					Respuesta a RoL
-				</button>
+				<PositionSelector
+					position="Respuesta a 3Bet"
+					active={sbAction === '3Bet'}
+					onClick={() => handleAction('3Bet')}
+					notCircle
+				/>
+				<PositionSelector
+					position="Respuesta a RoL"
+					active={sbAction === 'ROL'}
+					onClick={() => handleAction('ROL')}
+					notCircle
+				/>
 			</>
 		);
-	};
-
-	const getPositionsROL = (player = '') => {
-		const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB,BB';
-		const positionsArray = positions.split(',');
-		return positionsArray.map(p => {
-			const active = yourPosition === p ? 'active' : '';
-
-			return (
-				<button
-					className={`selector ${active}`}
-					key={p}
-					onClick={() => {
-						let indexYP = positionsArray.indexOf(yourPosition);
-						setYourPosition(p);
-						indexYP = positionsArray.indexOf(p);
-
-						const realYourPos = getRealPositionROL(indexYP);
-
-						setTableValues(initialState);
-						getData('ROL', `${realYourPos}`).then(rangeData => {
-							setRange(rangeData);
-							setTableValues(rangeData);
-						});
-
-						setSituation(`${realYourPos}`);
-					}}
-				>
-					{p}
-				</button>
-			);
-		});
-	};
+	}, [yourPosition, villainPosition, sbAction, setSituation]);
 
 	const renderSelectorPush = () => {
 		const handleSelection = event => {
@@ -384,41 +442,50 @@ export const LoadRange = () => {
 		}
 	}, [positionSelected, bbsSelected, setTableValues]);
 
-	const clearFunction = val => {
-		setTableValues({ ...tableValues, [val]: '' });
-	};
-
-	const handleMenu = val => {
+	const handleMenu = useCallback(val => {
 		setKey(val);
 		setTableValues(initialState);
-	};
+	}, [setTableValues]);
 
-	const handleAddMessage = () => {
-		const messages = [...tableValues.notes.messages, ''];
-		setTableValues({ ...tableValues, notes: { ...tableValues.notes, messages } });
-	};
+	const clearFunction = useCallback(val => {
+		setTableValues(prev => ({ ...prev, [val]: '' }));
+	}, [setTableValues]);
+
+	const handleAddMessage = useCallback(() => {
+		setTableValues(prev => ({
+			...prev,
+			notes: {
+				...prev.notes,
+				messages: [...(prev.notes?.messages || []), '']
+			}
+		}));
+	}, [setTableValues]);
+
+	// Effective stack selector component
+	const EffectiveStackSelector = () => (
+		<div className="selector-push">
+			<span>Effective Stack (BB)</span>
+			<div>
+				{['100bb', '60bb', '40bb', '30bb', '20bb', '15bb', '10bb'].map(stack => (
+					<button
+						key={stack}
+						className={`selector ${stack === effectiveStack ? 'active' : ''}`}
+						onClick={() => setEffectiveStack(stack)}
+					>
+						{stack}
+					</button>
+				))}
+			</div>
+		</div>
+	);
 
 	return (
 		<div className="selector-container">
-			<div className="button-container spaced">
-				<Button className={key === 'OR' ? 'selected' : ''} onClick={() => handleMenu('OR')}>
-					Open Raise
-				</Button>
-				<Button className={key === 'ROR' ? 'selected' : ''} onClick={() => handleMenu('ROR')}>
-					Respuesta vs OR
-				</Button>
-				<Button className={key === 'RES3' ? 'selected' : ''} onClick={() => handleMenu('RES3')}>
-					Respuesta 3Bet
-				</Button>
-				<Button className={key === 'ROL' ? 'selected' : ''} onClick={() => handleMenu('ROL')}>
-					ROL
-				</Button>
-				<Button className={key === 'PUSH' ? 'selected' : ''} onClick={() => handleMenu('PUSH')}>
-					Push por Pos. y Stack
-				</Button>
-			</div>
+			<MenuButtons key={key} handleMenu={handleMenu} />
+			<EffectiveStackSelector />
+
 			<div className="row content-container" style={{ justifyContent: 'center', paddingBottom: '15px' }}>
-				{key === 'OR' && getPositionsOR()}
+				{key === 'OR' && positionsOR}
 				{key === 'ROR' && (
 					<div className="selector-container">
 						<div className="selector-body">
@@ -447,56 +514,16 @@ export const LoadRange = () => {
 				{key === 'ROL' && getPositionsROL()}
 				{key === 'PUSH' && renderSelectorPush()}
 			</div>
-			<div className="selector-body spaced">
-				<Field
-					register={{ onChange: onChange, onClick: onClick }}
-					type="text"
-					name="raise"
-					label="Raise Range"
-					error={errors.raise}
-					placeholder="Raise Range"
-					value={tableValues?.raise}
-					clear={true}
-					clearFunction={() => clearFunction('raise')}
-					actionToAdd={actionToAdd}
-				/>
-				<Field
-					register={{ onChange: onChange, onClick: onClick }}
-					type="text"
-					name="call"
-					label="Call Range"
-					error={errors.call}
-					placeholder="Call Range"
-					value={tableValues?.call}
-					clear={true}
-					clearFunction={() => clearFunction('call')}
-					actionToAdd={actionToAdd}
-				/>
-				<Field
-					register={{ onChange: onChange, onClick: onClick }}
-					type="text"
-					name="bluff"
-					label="Bluff Range"
-					error={errors.bluff}
-					placeholder="Bluff Range"
-					value={tableValues?.bluff}
-					clear={true}
-					clearFunction={() => clearFunction('bluff')}
-					actionToAdd={actionToAdd}
-				/>
-				<Field
-					register={{ onChange: onChange, onClick: onClick }}
-					type="text"
-					name="fold"
-					label="Fold Range"
-					error={errors.fold}
-					placeholder="Fold Range"
-					value={tableValues?.fold}
-					clear={true}
-					clearFunction={() => clearFunction('fold')}
-					actionToAdd={actionToAdd}
-				/>
-			</div>
+
+			<RangeFields
+				tableValues={tableValues}
+				onChange={onChange}
+				onClick={onClick}
+				errors={errors}
+				clearFunction={clearFunction}
+				actionToAdd={actionToAdd}
+			/>
+
 			<Button onClick={handleSave}>Guardar</Button>
 
 			<div className="flex-container">
@@ -515,6 +542,7 @@ export const LoadRange = () => {
 								const text = rangeText.split('-')[1].split('|')[0];
 								return (
 									<div
+										key={index}
 										className={`flat-option ${flatSelected === index ? 'selected' : ''}`}
 										onClick={() => loadRangePush(rangeText, index)}
 									>

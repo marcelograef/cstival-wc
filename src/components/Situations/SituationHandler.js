@@ -13,10 +13,12 @@ const situationMap = {
 
 const SituationHandler = ({ situation, effectiveStack, ...props }) => {
 	useEffect(() => {
-		props['setSelectedPositions']('');
-
-	}, [situation, props]);
-
+		// Only clear positions when situation type changes
+		const situationType = situationMap[situation];
+		if (situationType) {
+			props['setSelectedPositions']('');
+		}
+	}, [situation]);
 
 	useEffect(() => {
 		console.log("SituationHandler",{ effectiveStack });
@@ -25,7 +27,6 @@ const SituationHandler = ({ situation, effectiveStack, ...props }) => {
 	const situationType = situationMap[situation];
 
 	if (!situationType) return null;
-
 
 	return <GenericSituation situationType={situationType} effectiveStack={effectiveStack} {...props} />;
 };

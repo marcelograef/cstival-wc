@@ -1,13 +1,8 @@
-export const colorMap = {
-	allIn: 'rgb(125, 31, 31)',
-	raise: 'rgb(240, 60, 60)',
-	call: 'rgb(90, 185, 102)',
-	fold: 'rgb(61, 124, 184)'
-};
+import { colors } from '../assets/styles/colors';
+
+export const colorMap = colors;
 
 export function getRangeCellStyle({ allIn = 0, raise = 0, call = 0, fold = 0 }) {
-
-
 	let layers = [];
 
 	if (allIn > 0) layers.push({ color: colorMap.allIn, percent: allIn });
@@ -33,7 +28,6 @@ export function getRangeCellStyle({ allIn = 0, raise = 0, call = 0, fold = 0 }) 
 	return {
 		backgroundImage,
 		backgroundSize,
-
 		backgroundRepeat: 'no-repeat'
 	};
 }

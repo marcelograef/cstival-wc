@@ -1,7 +1,7 @@
 // App.js (or any other high-level component)
 import React, { useEffect, useState } from 'react';
-import { MyContextProvider } from './context.js';
 import Home from './containers/home/index.js';
+import { MyContextProvider } from './context.js';
 
 import { CookiesProvider, useCookies } from 'react-cookie';
 import LoginForm from './containers/login/index.js';
@@ -18,14 +18,10 @@ const App = () => {
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		/* setCookie('user', 'test');
-		setData({ user: 'test' }); */
 		const data = cookies['user'];
 		setUser(data);
 		setLoading(false);
 	}, [cookies]);
-
-	// const { t } = useTranslation();
 
 	useCustomEventListener('cs-login', async data => {
 		setCookie('user', data.user);
@@ -39,7 +35,7 @@ const App = () => {
 			</div>
 		);
 	}
-	// const { t } = useTranslation();
+
 	return (
 		<MyContextProvider>
 			<CookiesProvider>

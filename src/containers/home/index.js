@@ -6,7 +6,7 @@ import { initialState } from '../../constants.js';
 import MyContext from '../../context.js';
 import './index.scss';
 
-import { colorMap } from '../../utilities/calculateColor';
+import { colors } from '../../assets/styles/colors';
 
 const Home = ({ user }) => {
 	const renderTabs = [
@@ -35,8 +35,14 @@ const Home = ({ user }) => {
 			onlyTable: false
 		}
 	];
-	if (user === 'cstival') {
-		renderTabs.push({ label: 'Load Range', layout: 'LOAD', category: 'load-range', situation: 'LoadRange' });
+	if (user === 'mgraef' ) {
+		renderTabs.push({
+			label: 'Load Range',
+			layout: 'LOAD',
+			category: 'load-range',
+			situation: 'LoadRange',
+			onlyTable: false
+		});
 	}
 
 	const { setTableValues, isLoading } = useContext(MyContext);
@@ -85,18 +91,20 @@ const Home = ({ user }) => {
 				</nav>
 
 				<section className="controls-section">
-					<div className="stack-sizes">
-						{['100bb', '60bb', '40bb', '30bb', '20bb', '15bb', '10bb'].map((s, i) => (
-							<div
-								key={s}
-								className={`stack-btn ${stack === s ? 'active' : ''}`}
-								data-stack={s}
-								onClick={onChangeStack}
-							>
-								{s} {(s === '15bb' || s === '10bb') && 'Push'}
-							</div>
-						))}
-					</div>
+					{selectedTab.onlyTable && (
+						<div className="stack-sizes">
+							{['100bb', '60bb', '40bb', '30bb', '20bb', '15bb', '10bb'].map((s, i) => (
+								<div
+									key={s}
+									className={`stack-btn ${stack === s ? 'active' : ''}`}
+									data-stack={s}
+									onClick={onChangeStack}
+								>
+									{s} {(s === '15bb' || s === '10bb') && 'Push'}
+								</div>
+							))}
+						</div>
+					)}
 
 					<div className="position-controls" id="situation-controls">
 						<SituationHandler
@@ -106,16 +114,20 @@ const Home = ({ user }) => {
 							setControlsContent={setControlsContent}
 							setNotes={setNotes}
 						/>
-						{controls}
+						{selectedTab.onlyTable && controls}
 					</div>
 				</section>
 
-				<section className="current-selection">
-					<h3 id="selection-title">
-						{activeTab?.label} - {stack} - {selectedPositions}
-					</h3>
-					<p id="selection-desc">Rango conservador de apertura desde Under The Gun con stacks profundos</p>
-				</section>
+				{selectedTab.onlyTable && (
+					<section className="current-selection">
+						<h3 id="selection-title">
+							{activeTab?.label} - {stack} - {selectedPositions}
+						</h3>
+						<p id="selection-desc">
+							Rango conservador de apertura desde Under The Gun con stacks profundos
+						</p>
+					</section>
+				)}
 
 				<div className="grid-container">
 					{selectedTab.onlyTable ? (
@@ -130,19 +142,19 @@ const Home = ({ user }) => {
 
 				<section className="legend">
 					<div className="legend-item">
-						<div className="legend-color" style={{ background: colorMap['allIn'] }}></div>
+						<div className="legend-color" style={{ background: colors.allIn }}></div>
 						<span>All-in</span>
 					</div>
 					<div className="legend-item">
-						<div className="legend-color" style={{ background: colorMap['raise'] }}></div>
+						<div className="legend-color" style={{ background: colors.raise }}></div>
 						<span>Raise</span>
 					</div>
 					<div className="legend-item">
-						<div className="legend-color" style={{ background: colorMap['call'] }}></div>
+						<div className="legend-color" style={{ background: colors.call }}></div>
 						<span>Call</span>
 					</div>
 					<div className="legend-item">
-						<div className="legend-color" style={{ background: colorMap['fold'] }}></div>
+						<div className="legend-color" style={{ background: colors.fold }}></div>
 						<span>Fold</span>
 					</div>
 				</section>

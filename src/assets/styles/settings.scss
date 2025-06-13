@@ -12,10 +12,17 @@ $cs-color-selected: rgb(90, 90, 91);
 
 $cs-color-red: #d65050;
 
-$cs-bluff-color: #f34646;
-$cs-raise-color: rgba(39, 199, 18, 0.938);
-$cs-call-color: rgb(255, 251, 0);
-$cs-fold-color: rgba(139, 138, 138, 0.8);
+:root {
+  --color-all-in: rgb(125, 31, 31);
+  --color-raise: rgb(240, 60, 60);
+  --color-call: rgb(90, 185, 102);
+  --color-fold: rgb(61, 124, 184);
+}
+
+$cs-bluff-color: var(--color-all-in);
+$cs-raise-color: var(--color-raise);
+$cs-call-color: var(--color-call);
+$cs-fold-color: var(--color-fold);
 
 $cs-timing: 0.4s;
 $cs-easing: ease-in-out;

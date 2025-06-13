@@ -31,7 +31,21 @@ export function useRangeSituation({
 			if (!pos) return;
 			setIsLoading(true);
 			setTableValues(initialState);
-			setSelectedPositions(pos);
+
+			// Format position string based on situation type
+			let formattedPosition = pos;
+			if (situationType === 'ROR' || situationType === 'RES3') {
+				// For response situations, pos will be in format "hero|villain"
+				formattedPosition = pos;
+			} else if (situationType === 'PUSH') {
+				// For push situations, pos will be in format "position|stack"
+				formattedPosition = pos;
+			} else {
+				// For other situations, just use the position
+				formattedPosition = pos;
+			}
+
+			setSelectedPositions(formattedPosition);
 			getData(situationType, pos, effectiveStack).then(data => {
 				console.log({ data });
 				setRange(data);

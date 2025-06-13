@@ -1,148 +1,69 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback, useMemo } from 'react';
 import { CardTable, InfoContainer } from '../index';
-
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import { initialState } from '../../constants.js';
 import MyContext from '../../context';
 import { getData } from '../../utilities';
 import { calculateAvg } from '../../utilities/calculateInfo';
 import './index.scss';
-//import { ranges } from './ranges';
 
-export const PushPositionStack = () => {
-	const { setTableValues } = useContext(MyContext);
+// Constants
+const POSITIONS = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB';
+const MAX_BBS = 20;
+const POSITIONS_ARRAY = POSITIONS.split(',');
 
+// Custom hook for grid cell interactions
+const useGridCellInteractions = (gridElement) => {
+	const gridHoveredCellDataAddressAtt = 'data-hovered-cell-address';
+	const cellDataAddressRow = 'data-row';
+	const cellDataAddressCol = 'data-column';
+
+	const updateHoveredCellAddress = useCallback((cellElement) => {
+		const dataAddress = `R${cellElement.getAttribute(cellDataAddressRow)}C${cellElement.getAttribute(
+			cellDataAddressCol
+		)}`;
+		if (dataAddress && gridElement?.current) {
+			gridElement.current.setAttribute(gridHoveredCellDataAddressAtt, dataAddress);
+		}
+	}, [gridElement]);
+
+	const removeHoveredCellAddress = useCallback(() => {
+		gridElement?.current?.removeAttribute(gridHoveredCellDataAddressAtt);
+	}, [gridElement]);
+
+	const onMouseOver = useCallback((event) => {
+		if (gridElement?.current) {
+			updateHoveredCellAddress(event.currentTarget);
+		}
+	}, [gridElement, updateHoveredCellAddress]);
+
+	const onMouseOut = useCallback(() => {
+		if (gridElement?.current) {
+			removeHoveredCellAddress();
+		}
+	}, [gridElement, removeHoveredCellAddress]);
+
+	return { onMouseOver, onMouseOut };
+};
+
+// Custom hook for range data management
+const useRangeData = (positionSelected, bbsSelected, setTableValues) => {
 	const [isLoading, setIsLoading] = useState(false);
-
-	const [selectedCell, setSelectedCell] = useState({ row: '', column: '' });
-	const [flatRanges, setFaltRanges] = useState([]);
-	const [flatSelected, setFlatSelected] = useState(-1);
-
-	const [bbsSelected, setBbsSelected] = useState('');
-	const [positionSelected, setPositionSelected] = useState('');
-
 	const [range, setRange] = useState({ info: {} });
 	const [avg, setAvg] = useState(null);
+	const [flatRanges, setFlatRanges] = useState([]);
+	const [flatSelected, setFlatSelected] = useState(-1);
 
 	useEffect(() => {
 		const res = calculateAvg(range);
 		setAvg(res);
 	}, [range]);
 
-	const positions = 'UTG,UTG+1,MP,MP+1,HJ,CO,BU,SB';
-	const bbs = 20;
-	const positionsArray = positions.split(',');
-
-	const Grid = forwardRef(({ className, children }, ref) => (
-		<div ref={ref} className={`table-position-bb ${className}`}>
-			{children}
-		</div>
-	));
-	const gridElement = useRef(null);
-
-	const gridHoveredCellDataAddressAtt = 'data-hovered-cell-address';
-	//const gridSelectedCellDataAddressAtt = 'data-selected-cell-address';
-	const cellDataAddressRow = 'data-row';
-	const cellDataAddressCol = 'data-column';
-
-	const updateHoveredCellAddress = cellElement => {
-		const dataAddress = `R${cellElement.getAttribute(cellDataAddressRow)}C${cellElement.getAttribute(
-			cellDataAddressCol
-		)}`;
-		if (dataAddress && gridElement) {
-			gridElement?.current.setAttribute(gridHoveredCellDataAddressAtt, dataAddress);
-		}
-	};
-
-	const removeHoveredCellAddress = () => {
-		gridElement && gridElement?.current.removeAttribute(gridHoveredCellDataAddressAtt);
-	};
-
-	const onMouseOver = event => {
-		if (gridElement?.current) {
-			updateHoveredCellAddress(event.currentTarget);
-		}
-	};
-
-	const onMouseOut = event => {
-		if (gridElement?.current) {
-			removeHoveredCellAddress();
-		}
-	};
-
-	const onClick = event => {
-		event.preventDefault();
-
-		const cellElement = event.currentTarget;
-		const row = cellElement.getAttribute(cellDataAddressRow);
-		const column = cellElement.getAttribute(cellDataAddressCol);
-
-		const dataAddress = `R${row}C${column}`;
-
-		const pos = positionsArray[row - 1];
-		const bbs = column;
-		if (dataAddress && gridElement) {
-			setSelectedCell({ row, column });
-			setPositionSelected(pos);
-			setBbsSelected(bbs);
-		}
-
-		//let text = event.target.innerText;
-		//const [pos, bbs] = text.split('-');
-		//const situation = `${pos.replace('+', '').replace(/\s/, '')}|${bbs.trim()}BB`;
-
-		/*
-		console.log({ situation });
-
-		getData('PUSH', situation).then(rangeData => {
-			setRange(rangeData);
-			setTableValues(rangeData);
-		}); */
-	};
-
-	const handleSelection = event => {
-		const {
-			value,
-			dataset: { target }
-		} = event.target;
-
-		switch (target) {
-			case 'BB':
-				setBbsSelected(value);
-				break;
-			case 'POS':
-				setPositionSelected(value);
-				break;
-
-			default:
-				break;
-		}
-	};
-
-	const handleSliderChange = event => {
-		const {
-			value,
-			dataset: { target }
-		} = event.target;
-
-		switch (target) {
-			case 'BB':
-				setBbsSelected(value);
-				break;
-			case 'POS':
-				setPositionSelected(value);
-				break;
-
-			default:
-				break;
-		}
-	};
-
 	useEffect(() => {
 		if (bbsSelected && positionSelected) {
 			let flag = false;
 			const auxRanges = [];
-			[...positionsArray, 'BB'].forEach(p => {
+			[...POSITIONS_ARRAY, 'BB'].forEach(p => {
 				if (flag) {
 					auxRanges.push(`F-${p}|${positionSelected.trim().replace('+', '')}|${bbsSelected.trim()}BB`);
 				}
@@ -150,66 +71,148 @@ export const PushPositionStack = () => {
 					flag = true;
 				}
 			});
-			setFaltRanges(auxRanges);
+			setFlatRanges(auxRanges);
 			setFlatSelected(-1);
-			setTableValues(initialState);
 
-			setSelectedCell({
-				row: positionsArray.indexOf(positionSelected) + 1,
-				column: bbsSelected
-			});
 			const situation = `${positionSelected.replace('+', '')}|${bbsSelected}BB`;
 			setIsLoading(true);
-			getData('PUSH', situation).then(rangeData => {
+			getData('PUSH', situation, '100bb').then(rangeData => {
 				setRange(rangeData);
 				setTableValues(rangeData);
 				setIsLoading(false);
 			});
 		}
-	}, [positionSelected, bbsSelected, positionsArray, setTableValues]);
+	}, [positionSelected, bbsSelected, setTableValues]);
 
-	const loadRange = (rangeSelector, index) => {
+	const loadRange = useCallback((rangeSelector, index) => {
 		setTableValues(initialState);
 		setFlatSelected(index);
 
 		setIsLoading(true);
-		getData('PUSH', rangeSelector.replace('+', '').replace(/\s/, '')).then(rangeData => {
+		getData('PUSH', rangeSelector.replace('+', '').replace(/\s/, ''), '100bb').then(rangeData => {
 			setRange(rangeData);
 			setTableValues(rangeData);
 			setIsLoading(false);
 		});
-	};
+	}, [setTableValues]);
 
-	const renderTable = () => {
+	return {
+		isLoading,
+		range,
+		avg,
+		flatRanges,
+		flatSelected,
+		loadRange
+	};
+};
+
+// Grid Component
+const Grid = forwardRef(({ className, children }, ref) => (
+	<div ref={ref} className={`table-position-bb ${className}`}>
+		{children}
+	</div>
+));
+
+const PushPositionStack = () => {
+	const { setTableValues } = useContext(MyContext);
+	const gridElement = useRef(null);
+	const [selectedCell, setSelectedCell] = useState({ row: '', column: '' });
+	const [bbsSelected, setBbsSelected] = useState('');
+	const [positionSelected, setPositionSelected] = useState('');
+
+	const { onMouseOver, onMouseOut } = useGridCellInteractions(gridElement);
+	const {
+		isLoading,
+		range,
+		avg,
+		flatRanges,
+		flatSelected,
+		loadRange
+	} = useRangeData(positionSelected, bbsSelected, setTableValues);
+
+	const handleSelection = useCallback((event) => {
+		const {
+			value,
+			dataset: { target }
+		} = event.target;
+
+		switch (target) {
+			case 'BB':
+				setBbsSelected(value);
+				break;
+			case 'POS':
+				setPositionSelected(value);
+				break;
+			default:
+				break;
+		}
+	}, []);
+
+	const handleSliderChange = useCallback((event) => {
+		const {
+			value,
+			dataset: { target }
+		} = event.target;
+
+		switch (target) {
+			case 'BB':
+				setBbsSelected(value);
+				break;
+			case 'POS':
+				setPositionSelected(value);
+				break;
+			default:
+				break;
+		}
+	}, []);
+
+	const onClick = useCallback((event) => {
+		event.preventDefault();
+
+		const cellElement = event.currentTarget;
+		const row = parseInt(cellElement.getAttribute('data-row'));
+		const column = parseInt(cellElement.getAttribute('data-column'));
+
+		if (row === 0 || column === 0) return;
+
+		const pos = POSITIONS_ARRAY[row - 1];
+		const bbs = column;
+
+		if (pos && bbs) {
+			setSelectedCell({ row, column });
+			setPositionSelected(pos);
+			setBbsSelected(bbs.toString());
+		}
+	}, []);
+
+	const renderTable = useMemo(() => {
 		const cells = [];
 
-		['', ...positionsArray].forEach((current, index, array) => {
+		['', ...POSITIONS_ARRAY].forEach((current, index) => {
 			if (current === '') {
 				cells.push(
-					<div>
+					<div key="header">
 						<div className="gridHeader">
 							<div className="diagonal"></div>
-							<div>
-								<span>BBs</span>
-							</div>
-							<div>
-								<span>Pos</span>
-							</div>
+							<div><span>BBs</span></div>
+							<div><span>Pos</span></div>
 							<div className="diagonal"></div>
 						</div>
 					</div>
 				);
 			} else {
 				cells.push(
-					<div data-column="0" data-row={index}>
+					<div key={`pos-${index}`} data-column="0" data-row={index}>
 						{current}
 					</div>
 				);
 			}
-			for (let i = bbs; i >= 2; i--) {
+
+			for (let i = MAX_BBS; i >= 2; i--) {
 				if (current === '') {
 					cells.push(
 						<div
+							key={`bb-${i}`}
 							data-column={i}
 							data-row="0"
 							onMouseOver={onMouseOver}
@@ -218,11 +221,18 @@ export const PushPositionStack = () => {
 					);
 				} else if (index < 6 && i > 15) {
 					cells.push(
-						<div data-row={index} data-column={i} onMouseOver={onMouseOver} onMouseOut={onMouseOut}></div>
+						<div
+							key={`empty-${index}-${i}`}
+							data-row={index}
+							data-column={i}
+							onMouseOver={onMouseOver}
+							onMouseOut={onMouseOut}
+						></div>
 					);
 				} else {
 					cells.push(
 						<div
+							key={`cell-${index}-${i}`}
 							data-row={index}
 							data-column={i}
 							onMouseOver={onMouseOver}
@@ -238,63 +248,64 @@ export const PushPositionStack = () => {
 				}
 			}
 		});
+
 		return <Grid ref={gridElement}>{cells}</Grid>;
-	};
+	}, [selectedCell, onMouseOver, onMouseOut, onClick]);
 
-	const renderSelector = () => {
-		return (
-			<>
-				<div className="selector-push">
-					<span>BBs</span>
-					<span>{bbsSelected ? bbsSelected : ''}</span>
-
-					<div className="slider-container">
-						<input
-							type="range"
-							min="2"
-							max="20"
-							value={bbsSelected}
-							className="slider"
-							id="myRange"
-							onChange={handleSliderChange}
+	const renderSelector = useMemo(() => (
+		<>
+			<div className="selector-push">
+				<span>BBs</span>
+				<span>{bbsSelected || ''}</span>
+				<div className="slider-container">
+					<input
+						type="range"
+						min="2"
+						max="20"
+						value={bbsSelected}
+						className="slider"
+						id="myRange"
+						onChange={handleSliderChange}
+						data-target="BB"
+					/>
+				</div>
+				<div className="buttons-selector">
+					{Array.from({ length: 19 }, (_, i) => i + 2).map(i => (
+						<button
+							key={`bb-${i}`}
 							data-target="BB"
-						/>
-					</div>
-					<div className="buttons-selector">
-						{Array.from({ length: 19 }, (x, i) => i + 2).map(i => (
-							<button
-								data-target="BB"
-								className={i === parseInt(bbsSelected) ? 'active' : ''}
-								onClick={handleSelection}
-								value={i}
-							>
-								{i}
-							</button>
-						))}
-					</div>
+							className={i === parseInt(bbsSelected) ? 'active' : ''}
+							onClick={handleSelection}
+							value={i}
+						>
+							{i}
+						</button>
+					))}
 				</div>
-				<div className="selector-push">
-					<span>Position</span>
-					<div>
-						{positionsArray.map(p => (
-							<button
-								data-target="POS"
-								className={p === positionSelected ? 'active' : ''}
-								onClick={handleSelection}
-								value={p}
-							>
-								{p}
-							</button>
-						))}
-					</div>
+			</div>
+			<div className="selector-push">
+				<span>Position</span>
+				<div>
+					{POSITIONS_ARRAY.map(p => (
+						<button
+							key={`pos-${p}`}
+							data-target="POS"
+							className={p === positionSelected ? 'active' : ''}
+							onClick={handleSelection}
+							value={p}
+						>
+							{p}
+						</button>
+					))}
 				</div>
-			</>
-		);
-	};
+			</div>
+		</>
+	), [bbsSelected, positionSelected, handleSelection, handleSliderChange]);
+
 	return (
 		<div className="selector-container">
-			<div>{renderSelector()}</div>
-			<div className="selector-body-push">{renderTable()}</div>
+			<div>{renderSelector}</div>
+			<div className="selector-body-push">{renderTable}</div>
 			<div className="flex-container">
 				<div className="row content-container">
 					<>
@@ -307,6 +318,7 @@ export const PushPositionStack = () => {
 									const text = rangeText.split('-')[1].split('|')[0];
 									return (
 										<div
+											key={`flat-${index}`}
 											className={`flat-option ${flatSelected === index ? 'selected' : ''}`}
 											onClick={() => loadRange(rangeText, index)}
 										>
