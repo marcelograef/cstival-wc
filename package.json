@@ -8,8 +8,8 @@
     "build:wc": "webpack --config webpack.config.js --mode production",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build:wc",
-    "deploy": "gh-pages -d dist"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
