@@ -23,7 +23,7 @@ export function useRangeSituation({
 	useEffect(() => {
 		if (!range?.notes) return;
 		const avg = calculateAvg(range);
-		setNotes?.({ ...avg, betSize: range?.notes?.span02 });
+		setNotes?.({ ...avg, betSize: range?.notes?.span02, notesObject: range?.notes });
 	}, [range, setNotes]);
 
 	const handleClick = useCallback(

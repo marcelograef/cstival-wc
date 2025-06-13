@@ -1,74 +1,43 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Wrapper from '../../../layouts/Wrapper/index.js';
 import CardTable from '../../PokerTable/index.js';
 import SituationHandler from '../../Situations/SituationHandler.js';
 import situationComponents from '../../Situations/situationComponent.js';
 import { initialState } from '../../../../utils/constants/constants.js';
+import { RENDER_TABS, ADMIN_TABS, STACK_SIZES } from '../../../../utils/constants/tabs.js';
 import MyContext from '../../../../context/context.js';
 import './index.scss';
 
 import { colors } from '../../../../assets/styles/colors.js';
 
 const Home = ({ user }) => {
-	const renderTabs = [
-		{ label: 'Open Raise', layout: 'OR', category: 'openraising', situation: 'OpenRaise', onlyTable: true },
-		{ label: 'Respuesta al OR', layout: 'ROR', category: 'respuesta-or', situation: 'ResponseOR', onlyTable: true },
-		{
-			label: 'Respuesta 3Bet',
-			layout: 'RES3',
-			category: 'respuesta-3bet',
-			situation: 'Response3Bet',
-			onlyTable: true
-		},
-		{ label: 'ROL', layout: 'ROL', category: 'raise-over-limp', situation: 'ROL', onlyTable: true },
-		{
-			label: 'Push por Stack',
-			layout: 'PUSH',
-			category: 'push-stack',
-			situation: 'PushPositionStack',
-			onlyTable: false
-		},
-		{
-			label: 'Calculadora Buy-In',
-			layout: 'CALC',
-			category: 'CALC',
-			situation: 'BuyInCalculator',
-			onlyTable: false
-		}
-	];
-	if (user === 'mgraef' ) {
-		renderTabs.push({
-			label: 'Load Range',
-			layout: 'LOAD',
-			category: 'load-range',
-			situation: 'LoadRange',
-			onlyTable: false
-		});
-	}
-
 	const { setTableValues, isLoading } = useContext(MyContext);
-
 	const [stack, setStack] = useState('100');
-	const [selectedTab, setSelectedTab] = useState(renderTabs[0]);
-
+	const [selectedTab, setSelectedTab] = useState(RENDER_TABS[0]);
 	const [selectedPositions, setSelectedPositions] = useState('');
 	const [controls, setControlsContent] = useState(null);
-
 	const [notes, setNotes] = useState(null);
+
+	const renderTabs = [...RENDER_TABS, ...(user === 'mgraef' ? ADMIN_TABS : [])];
 
 	const onClick = tab => {
 		setSelectedTab(tab);
 		setTableValues(initialState);
+		setSelectedPositions('');
+		setControlsContent(null);
+		setNotes(null);
 	};
 
 	const onChangeStack = evt => {
 		const stack = evt.currentTarget.dataset.stack;
-
 		setTableValues(initialState);
 		setStack(stack);
 	};
 
 	const activeTab = renderTabs.find(i => i.layout === selectedTab.layout);
+
+
+
 
 	return (
 		<Wrapper>
@@ -85,6 +54,9 @@ const Home = ({ user }) => {
 							className={`main-tab ${selectedTab.layout === tab.layout ? 'active' : ''}`}
 							data-category={tab.category}
 							onClick={() => onClick(tab)}
+							role="tab"
+							aria-selected={selectedTab.layout === tab.layout}
+							tabIndex={0}
 						>
 							{tab.label}
 						</div>
@@ -94,14 +66,17 @@ const Home = ({ user }) => {
 				<section className="controls-section">
 					{selectedTab.onlyTable && (
 						<div className="stack-sizes">
-							{['100bb', '60bb', '40bb', '30bb', '20bb', '15bb', '10bb'].map((s, i) => (
+							{STACK_SIZES.map(({ value, label }) => (
 								<div
-									key={s}
-									className={`stack-btn ${stack === s ? 'active' : ''}`}
-									data-stack={s}
+									key={value}
+									className={`stack-btn ${stack === value ? 'active' : ''}`}
+									data-stack={value}
 									onClick={onChangeStack}
+									role="button"
+									tabIndex={0}
+									aria-pressed={stack === value}
 								>
-									{s} {(s === '15bb' || s === '10bb') && 'Push'}
+									{label}
 								</div>
 							))}
 						</div>
@@ -125,7 +100,7 @@ const Home = ({ user }) => {
 							{activeTab?.label} - {stack} - {selectedPositions}
 						</h3>
 						<p id="selection-desc">
-							Rango conservador de apertura desde Under The Gun con stacks profundos
+							{notes?.notesObject?.span01}
 						</p>
 					</section>
 				)}
@@ -141,7 +116,7 @@ const Home = ({ user }) => {
 					)}
 				</div>
 
-				<section className="legend">
+				<section className="legend" role="complementary" aria-label="Legend">
 					<div className="legend-item">
 						<div className="legend-color" style={{ background: colors.allIn }}></div>
 						<span>All-in</span>
@@ -160,7 +135,7 @@ const Home = ({ user }) => {
 					</div>
 				</section>
 
-				<section className="stats">
+				<section className="stats" role="complementary" aria-label="Statistics">
 					<div className="stat-item">
 						<div className="stat-number">{notes?.totalAvg}</div>
 						<div className="stat-label">Rango de Apertura</div>
